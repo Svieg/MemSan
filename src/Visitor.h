@@ -21,11 +21,17 @@ public:
 
   Visitor(clang::ASTContext &context) : context_(context) {
     _dumpFile =  new std::ofstream("MemSan.dump", std::ofstream::out);
+    *_dumpFile << "<dump>" << std::endl;
   };
 
+  ~Visitor() {
+
+    *_dumpFile << "</dump>" << std::endl;
+    _dumpFile->close();
+
+  }
+
   std::ofstream* getDumpFile() {return _dumpFile;}
-  
-  bool closeDumpFile() {_dumpFile->close();}
 
   // Visites
   bool VisitBreakStmt(clang::BreakStmt *S);
