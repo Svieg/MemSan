@@ -6,6 +6,11 @@
 #include <clang/AST/ASTContext.h>
 #include <clang/Lex/Lexer.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <iterator>
+#include <fstream>
 
 /**
  * LOG6302 Cette classe est un exemple d'un visiteur récursif de clang. À l'intérieur, vous pouvez y trouver deux exemples
@@ -14,17 +19,28 @@
 class Visitor : public clang::RecursiveASTVisitor<Visitor> {
 public:
 
-  Visitor(clang::ASTContext &context) : context_(context) {};
+  Visitor(clang::ASTContext &context) : context_(context) {
+    _dumpFile =  new std::ofstream("MemSan.dump", std::ofstream::out);
+  };
+
+  std::ofstream* getDumpFile() {return _dumpFile;}
+  
+  bool closeDumpFile() {_dumpFile->close();}
 
   // Visites
-  bool VisitCXXRecordDecl(clang::CXXRecordDecl *D);
-  bool VisitIfStmt(clang::IfStmt *S);
+  bool VisitBreakStmt(clang::BreakStmt *S);
+  bool VisitVarDecl(clang::VarDecl *D);
 
   // Traverses
+  bool TraverseWhileStmt(clang::WhileStmt *S);
+  bool TraverseIfStmt(clang::IfStmt *S);
   bool TraverseCXXMethodDecl(clang::CXXMethodDecl *D);
+  bool TraverseCXXRecordDecl(clang::CXXRecordDecl *D);
+  bool TraverseFunctionDecl(clang::FunctionDecl *D);
 
 private:
   clang::ASTContext &context_;
+  std::ofstream* _dumpFile;
 
 
   std::string GetStatementString(clang::Stmt *S) {
