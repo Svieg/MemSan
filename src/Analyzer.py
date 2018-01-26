@@ -27,12 +27,12 @@ class ASTAnalyzer(object):
 
     def parse_class(self):
         for child in self.root:
-            if child.tag == "class":
+            if classChild.tag == "filename":
+                filename = classChild.text
+            elif child.tag == "class":
                 for classChild in child:
                     if classChild.tag == "className":
                         classname = classChild.text
-                    elif classChild.tag == "filename":
-                        filename = classChild.text
                     elif classChild.tag == "method":
                         nb_ifs = 0
                         nb_while = 0
