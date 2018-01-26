@@ -27,8 +27,8 @@ class ASTAnalyzer(object):
 
     def parse_class(self):
         for child in self.root:
-            if classChild.tag == "filename":
-                filename = classChild.text
+            if child.tag == "filename":
+                filename = child.text
             elif child.tag == "class":
                 for classChild in child:
                     if classChild.tag == "className":
