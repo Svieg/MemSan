@@ -15,7 +15,7 @@ bool Visitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *D) {
     splitted_path.push_back(token);
   }
 
-  *getDumpFile() << "<file> " << splitted_path[splitted_path.size() - 1] << " </file>" << std::endl;
+  *getDumpFile() << "<filename> " << splitted_path[splitted_path.size() - 1] << " </filename>" << std::endl;
 
   *getDumpFile() <<"<class><className>" << D->getName().str() << "</className>"<< std::endl;
 
