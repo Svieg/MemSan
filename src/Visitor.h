@@ -36,6 +36,7 @@ public:
   // Visites
   bool VisitBreakStmt(clang::BreakStmt *S);
   bool VisitVarDecl(clang::VarDecl *D);
+  bool VisitFieldDecl(clang::FieldDecl *D);
 
   // Traverses
   bool TraverseWhileStmt(clang::WhileStmt *S);
