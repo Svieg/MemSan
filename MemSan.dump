@@ -1,0 +1,13 @@
+<dump>
+<function> <functionName> main</functionName>
+    <while>
+        <if>
+            <return>
+                <unaryOperator></unaryOperator>
+            </return>
+        </if>
+    </while>
+    <return>
+    </return>
+</function>
+</dump>

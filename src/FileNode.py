@@ -5,8 +5,9 @@ class FileNode(object):
     def __init__(self):
         self.name = None
         self.classes = {}
+        self.children = []
 
-    def __str__(self):
+    def dump(self, cfg):
         line = """
 digraph G {
         fontname = "Bitstream Vera Sans"
@@ -22,8 +23,10 @@ digraph G {
                 fontname = "Bitstream Vera Sans"
                 fontsize = 8
         ] \n
+        
 """
         for class_name in self.classes.keys():
             line += str(self.classes[class_name])
+        line += cfg
         line += "\n}"
         return line

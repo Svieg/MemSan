@@ -37,6 +37,8 @@ public:
   bool VisitBreakStmt(clang::BreakStmt *S);
   bool VisitVarDecl(clang::VarDecl *D);
   bool VisitFieldDecl(clang::FieldDecl *D);
+  bool VisitContinueStmt(clang::ContinueStmt*);
+  bool VisitUnaryOperator(clang::UnaryOperator*);
 
   // Traverses
   bool TraverseWhileStmt(clang::WhileStmt *S);
@@ -44,6 +46,8 @@ public:
   bool TraverseCXXMethodDecl(clang::CXXMethodDecl *D);
   bool TraverseCXXRecordDecl(clang::CXXRecordDecl *D);
   bool TraverseFunctionDecl(clang::FunctionDecl *D);
+  bool TraverseReturnStmt(clang::ReturnStmt*);
+  bool TraverseForStmt(clang::ForStmt*);
 
 private:
   clang::ASTContext &context_;

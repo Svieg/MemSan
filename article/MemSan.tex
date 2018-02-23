@@ -34,74 +34,67 @@ MemSan is a user-supplied data flow analyzer targeting memory-sensitize function
 \section{Introduction}
 % no \IEEEPARstart
 
-The second part of the project was to build UML class diagrams from
- C++ source code. This proved more difficult as it will be explained
- in the next sections. 
+The third part of the project was to construct the control flow graphs from the source code. We only had to create intra-procedural CFGs. The do and switch statements are still missing from the control flow graph for the moment.
 
 \section{Methodology}
 
 Clang's ASTRecursiveVisitor was still used for the part
- that builds our own AST. Some parts were added and some
- were removed. Python classes for the analysis part of the project
- were also implemented to ease the next steps as it was mostly an hardcoded
- logic for the first part of the project and couldn't scale more.
+ that builds our own AST. Some parts were added like: VisitBreakStmt,
+ VisitContinueStmt, VisitUnaryOperator, TraverseForStmt, TraverseReturnStmt.
+ Python classes for the analysis part of the project
+ were once again added to ease the analysis.
  The code is available on github at svieg/MemSan.
 
 \subsection{Implementation}
 
- For the UML class diagrams, I didn't need
- the number of local variables, break statements, if statements
- and while statements. As those could come in handy in the next steps,
- they were kept in the code of MemSan as comments. Only one
- visit was added, the FieldDecl one. This one provides a visit
- for the class attributes. The type also needed to be extracted
- in our AST. Luckily, the getType() method was defined with the
- getAsString() method to convert from internal clang types to strings.
- This was used for CXXRecordDecl which are classes and FieldDecl.
- For methods, getResultType() was called to resolve the return value type.
- This one proved tricky as it will be explained in the difficulties section later.
- For the XML part, the following tags were added: parentClass that stores the
- name of the base class in case the class MemSan is analyzing inherits from another one,
- methodReturnType that stores the return value type of that method. Also, since the
- attributes were new in this part of the project, I needed tags to identify them.
- We added the attribute tag to encapsulate all the attributes information
- As I couldn't get a real project meeting the course requirements to compile using my
- tool, the test called LOG6302\_TP1\_example.cpp was heavily modified to test the new use
- cases. I now use a base class named BaseClass that has one public and one private
- attribute and a method that returns a void*. One class inherits from this base class
- and is called ChildClass. The third and final class doesn't use inheritance but
- has an attribute that is of the type BaseClass. This example can then demonstrate
- most of the use cases.
+ For the C++ part, the logic didn't change apart from the additions discussed
+ previously.
 
+ Introduced in the second part of the project, Nodes were still used
+ to interpret the output of the C++ part of the project. Although the core concept
+ was the same (using nodes), a lot of refactoring had to take place to be able to walk
+ the AST recursively as it eased the construction of the control flow graph. First,
+ every node class was stripped down to only its name and then I added a node type to
+ facilitate the implementation as I didn't need to check if the object was an instance
+ of any node that could be possible. Every node was then added a children attribute
+ that is a list of all its children. An edge will then be added between a parent node
+ and a child node in the dumping process. The walk of the AST is split into two catefories:
+ one is responsible for the dispatch to the right parse function according to the XML tag
+ that it reads so we don't have to repeat the dispatch code in every parse function of every
+ node type. The second one are the parser functions which every node type has one of. Every
+ node type has its own steps required like the WhileNode which needs a whileEnd and whileBegin
+ as well as a testing condition to break out of the loop. Similar logic has been implement for
+ the ForNode as well as the ifNode. The others are simpler and only need to be linked to its
+ immediate predecessor as it is the case for the unaryOperator, ContinueStmt and BreakStmt. The
+ ReturnStmt is a special case has it need to linked to the exit node. The exit node is a singleton
+ node that is the first to be created to be able to link to it without errors when GraphViz parses
+ the output of our tool.
 
 \section{Results and Discussion}
 
-Sadly, I couldn't get a real project to work on and had to work on a fake example
- that I created myself as discussed above.
+Sadly, I still couldn't get a real project to work on since I lacked time and had to work on a fake example provided in the lab.
 
 \subsection{Results}
 
-The UML class diagram that was created with MemSan is included in the appendix.
-
+The CFG produced is included in the appendix. Some bugs are still present as you can see from the
+figure. Firstly, the unaryOperator is in the wrong order as the returnStmt is currently a traverse
+and the unaryOperator is treated like its child but it is the returnStmt that is linked to the
+exit node. Secondly, some edges are missing and I couldn't find the bug in the logic in time.
+ Thridly, some edges are duplicated as we can see in one of the return nodes. This is caused by the
+ fact that the return node has multiple parents and causes the node to be visited multiple times and
+ then the logic that is responsible for linking the return node to the exit nodes is executed
+ multiple times.
 
 \subsection{Difficulties}
 
 \subsubsection{Compilation}
-Unfortunately, a lot of time was still spent trying to compile a real C++ project.
- My first project's choice was KVM but I realized that most of it is plain C and
- therefore doesn't the course requirements. I then tried several projects including
- chromium-os, firefox and chromium but all failed with my tests.
 
-\subsubsection{Documentation}
-
-Furthermore, I was using the public version of the documentation hosted on clang's
- website but used the 3.3 version while coding. Some features were lacking and
- it took me some time to realise why that was so.
+I didn't have time to spend on fixing the compilation for the chromium-os project.
 
 \section{Conclusion}
 
-I was able to create a UML class diagram from C++ source code but only in
- the example I created myself.
+I was able to create a CFG from C++ source code but only in
+ the example I was provided and minor bugs.
 
 
 
@@ -117,7 +110,7 @@ I was able to create a UML class diagram from C++ source code but only in
 
 \section{Appendix}
 
-\includegraphics{graph}
+\includegraphics{cfg}
 
 \end{document}
 

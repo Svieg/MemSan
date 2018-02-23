@@ -15,7 +15,7 @@ bool Visitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *D) {
     splitted_path.push_back(token);
   }
 
-  //*getDumpFile() << "<filename> " << splitted_path[splitted_path.size() - 1] << " </filename>" << std::endl;
+  *getDumpFile() << "<filename> " << splitted_path[splitted_path.size() - 1] << " </filename>" << std::endl;
 
   *getDumpFile() <<"<class><className>" << D->getName().str() << "</className>"<< std::endl;
 
@@ -36,9 +36,9 @@ bool Visitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *D) {
 /**********************/
 
 bool Visitor::TraverseIfStmt(clang::IfStmt *S) {
-//  *getDumpFile()<<"<if>" << std::endl;
-//  clang::RecursiveASTVisitor<Visitor>::TraverseIfStmt(S);
-//  *getDumpFile()<<"</if>" << std::endl;
+  *getDumpFile()<<"<if>" << std::endl;
+  clang::RecursiveASTVisitor<Visitor>::TraverseIfStmt(S);
+  *getDumpFile()<<"</if>" << std::endl;
 
   return true;
 }
@@ -49,9 +49,9 @@ bool Visitor::TraverseIfStmt(clang::IfStmt *S) {
 
 bool Visitor::TraverseWhileStmt(clang::WhileStmt *S) {
 
-//  *getDumpFile() << "<while>" << std::endl;
-//  clang::RecursiveASTVisitor<Visitor>::TraverseWhileStmt(S);
-//  *getDumpFile() << "</while>" << std::endl;
+  *getDumpFile() << "<while>" << std::endl;
+  clang::RecursiveASTVisitor<Visitor>::TraverseWhileStmt(S);
+  *getDumpFile() << "</while>" << std::endl;
     return true;
 
 }
@@ -67,12 +67,12 @@ bool Visitor::TraverseCXXMethodDecl(clang::CXXMethodDecl *D) {
 
     *getDumpFile() << "<method>" << std::endl;
     *getDumpFile() << "<methodName>" << D->getName().str() << "</methodName>" << std::endl;
-//    if (D->isPublic()) {
-//        *getDumpFile() << "<methodScope>public</methodScope>" << std::endl;
-//    }
-//    else {
-//        *getDumpFile() << "<methodScope>private</methodScope>" << std::endl;
-//    }
+    /*if (D->isPublic()) {
+        *getDumpFile() << "<methodScope>public</methodScope>" << std::endl;
+    }
+    else {
+        *getDumpFile() << "<methodScope>private</methodScope>" << std::endl;
+    }*/
     *getDumpFile() << "<methodReturnType>" << D->getResultType().getAsString() << "</methodReturnType>" << std::endl;
 
     clang::RecursiveASTVisitor<Visitor>::TraverseCXXMethodDecl(D);
@@ -84,11 +84,11 @@ bool Visitor::TraverseCXXMethodDecl(clang::CXXMethodDecl *D) {
 
 bool Visitor::TraverseFunctionDecl(clang::FunctionDecl *D) {
 
-  //*getDumpFile() << "<function> <functionName> " << D->getName().str() << "</functionName>" << std::endl;
+  *getDumpFile() << "<function> <functionName> " << D->getName().str() << "</functionName>" << std::endl;
 
-  //clang::RecursiveASTVisitor<Visitor>::TraverseFunctionDecl(D);
+  clang::RecursiveASTVisitor<Visitor>::TraverseFunctionDecl(D);
 
-  //*getDumpFile() << "</function>" << std::endl;
+  *getDumpFile() << "</function>" << std::endl;
     return true;
 
 }
@@ -99,7 +99,7 @@ bool Visitor::TraverseFunctionDecl(clang::FunctionDecl *D) {
 
 bool Visitor::VisitVarDecl(clang::VarDecl *D) {
 
-  //*getDumpFile() << "<var> " << D->getName().str() << " </var>" << std::endl;
+  *getDumpFile() << "<var> " << D->getName().str() << " </var>" << std::endl;
 
   return true;
 }
@@ -110,7 +110,7 @@ bool Visitor::VisitVarDecl(clang::VarDecl *D) {
 
 bool Visitor::VisitBreakStmt(clang::BreakStmt *D) {
 
-  //*getDumpFile() << "<break></break>" << std::endl;
+  *getDumpFile() << "<break></break>" << std::endl;
   return true;
 
 }
@@ -124,14 +124,46 @@ bool Visitor::VisitFieldDecl(clang::FieldDecl *D) {
     *getDumpFile() << "<attribute>" << std::endl;
     *getDumpFile() << "<attributeName>" << D->getName().str() << "</attributeName>" << std::endl;
     *getDumpFile() << "<attributeType>" << D->getType().getAsString() << "</attributeType>" << std::endl;
-    //if (D->isPublic()) {
-    //    *getDumpFile() << "<attributeScope>public</attributeScope>" << std::endl;
-    //}
-    //else {
-    //    *getDumpFile() << "<methodScope>private</methodScope>" << std::endl;
-    //}
- 
+    /*if (D->isPublic()) {
+        *getDumpFile() << "<attributeScope>public</attributeScope>" << std::endl;
+    }
+    else {
+        *getDumpFile() << "<methodScope>private</methodScope>" << std::endl;
+    }*/
+
     *getDumpFile() << "</attribute>" << std::endl;
     return true;
+
+}
+
+/*
+ * Return statement traverse
+ * */
+
+bool Visitor::TraverseReturnStmt(clang::ReturnStmt *D) {
+
+    *getDumpFile() << "<return>" << std::endl;
+    clang::RecursiveASTVisitor<Visitor>::TraverseReturnStmt(D);
+    *getDumpFile() << "</return>" << std::endl;
+}
+
+bool Visitor::VisitContinueStmt(clang::ContinueStmt *D) {
+
+    *getDumpFile() << "<continue></continue>" << std::endl;
+
+}
+
+
+bool Visitor::TraverseForStmt(clang::ForStmt *D) {
+
+    *getDumpFile() << "<for>" << std::endl;
+    clang::RecursiveASTVisitor<Visitor>::TraverseForStmt(D);
+    *getDumpFile() << "</for>" << std::endl;
+
+}
+
+bool Visitor::VisitUnaryOperator(clang::UnaryOperator *D) {
+
+    *getDumpFile() << "<unaryOperator></unaryOperator>" << std::endl;
 
 }

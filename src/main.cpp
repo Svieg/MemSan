@@ -113,6 +113,15 @@ int main(int argc, const char **argv) {
     for (unsigned int i = 1; i < argc; ++i) {
       CommandLine.push_back(std::string(argv[i]));
     }
+    CommandLine.push_back("-I/usr/include");
+    CommandLine.push_back("-I/usr/include/boost/");
+    CommandLine.push_back("-I/usr/include/c++/5/tr1");
+    CommandLine.push_back("-stdlib=libc++");
+    CommandLine.push_back("-I/home/svieg/tools/chromium-os/src/aosp/external/libcxx/include/");
+    CommandLine.push_back("-I/home/svieg/tools/chromium-os/src/third_party/kernel/v4.4/include/linux/");
+    CommandLine.push_back("-I/home/svieg/tools/chromium-os/src/third_party/kernel/v4.4/include/");
+    CommandLine.push_back("-I/home/svieg/tools/chromium-os/src/third_party/kernel/v4.4/include/uapi/linux/");
+
 
     clang::tooling::ToolInvocation invocation(
       std::move(CommandLine),

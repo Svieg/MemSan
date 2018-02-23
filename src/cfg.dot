@@ -1,0 +1,44 @@
+
+digraph G {
+        fontname = "Bitstream Vera Sans"
+        fontsize = 8
+
+        node [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+                shape = "record"
+        ]
+
+        edge [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+        ] 
+
+        
+end [label="Exit\nmain"]
+main [label="Entry\nmain"]
+main -> while1
+main -> return2
+while1 [label=whileBegin]
+while1 -> Condition1
+Condition1 [label=Condition]
+Condition1 -> whileEnd1
+Condition1 -> if1
+whileEnd1 [label=whileEnd]
+whileEnd1 -> return2
+return2 [label=return]
+return2 -> end
+if1 [label=ifBegin]
+if1 -> Condition
+Condition [label=Condition]
+Condition -> return1
+Condition -> ifEnd1
+return1 [label=return]
+return1 -> end
+return1 -> unaryOperator1
+unaryOperator1 [label=unaryOperator]
+ifEnd1 [label=ifEnd]
+return2 [label=return]
+return2 -> end
+
+}

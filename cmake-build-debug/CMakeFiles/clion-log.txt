@@ -1,0 +1,5 @@
+/home/svieg/.local/share/JetBrains/Toolbox/apps/CLion/ch-1/173.4127.32/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/svieg/school/fourth/6302/MemSan
+-- Using old version of LLVM/Clang
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/svieg/school/fourth/6302/MemSan/cmake-build-debug

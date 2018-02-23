@@ -1,0 +1,3 @@
+/home/svieg/school/fourth/6302/MemSan/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/svieg/school/fourth/6302/MemSan/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/svieg/school/fourth/6302/MemSan/cmake-build-debug/CMakeFiles/LOG6302.dir

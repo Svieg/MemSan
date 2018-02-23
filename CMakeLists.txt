@@ -8,7 +8,7 @@ set(SOURCE_FILES src/main.cpp src/Visitor.cpp src/Visitor.h)
 # LOG6302
 # CHANGER LA VALEUR DE "LLVM_PATH" EN DESSOUS POUR UTILISER UNE AUTRE VERSION DE CLANG
 # NORMALEMENT, LLVM_PATH DOIT CONTENIR LES DOSSIERS "lib" ET "include".
-set(LLVM_PATH /home/local/cours/INF6603/clang+llvm-3.3-x86_64-fedora18)
+set(LLVM_PATH /home/svieg/tools/llvm+clang)
 
 set(USE_OLD_CLANG true)
 if (EXISTS "${LLVM_PATH}/lib/libLLVMProfileData.so")
@@ -18,7 +18,11 @@ else()
     MESSAGE(STATUS "Using old version of LLVM/Clang")
 endif()
 
-include_directories(${LLVM_PATH}/include)
+include_directories(
+        ${LLVM_PATH}/include
+        /usr/include
+        /usr/include/c++
+)
 link_directories(${LLVM_PATH}/lib)
 add_definitions(-DLLVM_PATH=\"${LLVM_PATH}\")
 
@@ -33,7 +37,6 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(
         ${PROJECT_NAME}
 
-        clangTooling
         clangFrontend
         clangFrontendTool
         clangParse
@@ -46,6 +49,7 @@ target_link_libraries(
         clangEdit
         clangLex
         clangBasic
+        clangTooling
 
         LLVMMC
         LLVMMCParser
@@ -54,6 +58,7 @@ target_link_libraries(
         LLVMSupport
         LLVMOption
 
+        tinfo
         pthread
         dl
         z
