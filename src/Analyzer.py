@@ -116,8 +116,8 @@ class ASTAnalyzer(object):
     def parseWhile(self, parent, whileXMLNode, previousNode):
         new_while = self.new_node("WhileBegin", parent)
 
-        if previousNode is not None:
-            previousNode.children.append(new_while)
+        #if previousNode is not None:
+        #    previousNode.children.append(new_while)
 
         condition = self.new_node("Condition", new_while)
 
@@ -133,9 +133,6 @@ class ASTAnalyzer(object):
 
         new_if = self.new_node("ifBegin", parent)
 
-        if previousNode is not None:
-            previousNode.children.append(new_if)
-
         # condition
         condition = self.new_node("Condition", new_if)
 
@@ -149,58 +146,48 @@ class ASTAnalyzer(object):
 
         new_return = self.new_node("return", parent)
 
-        if previousNode is not None:
-            previousNode.children.append(new_return)
-
         new_return.children.append(self.endNode)
         self.parseNode(new_return, returnXMLNode)
         #TODO: check why returns None
-        return None
+        return new_return
 
     def parseBreak(self, parent, returnXMLNode, previousNode):
 
         new_break = self.new_node("break", parent)
 
-        if previousNode is not None:
-            previousNode.children.append(new_break)
-
         self.parseNode(new_break, returnXMLNode)
 
-        return None
+        return new_break
 
     def parseContinue(self, parent, returnXMLNode, previousNode):
 
         new_continue = self.new_node("continue", parent)
 
-        if previousNode is not None:
-            previousNode.children.append(new_continue)
-
         self.parseNode(new_continue, returnXMLNode)
-        return None
+        return new_continue
 
     def parseFor(self, parent, XMLNode, previousNode):
 
         new_for = self.new_node("for", parent)
 
-        if previousNode is not None:
-            previousNode.children.append(new_for)
-
         condition = self.new_node("Condition", new_for)
 
         forEnd = self.new_node("forEnd", condition)
 
-        self.parseNode(condition, XMLNode)
+        node_to_return = forEnd
+        for child in XMLNode:
+            node_to_return = self.parseNode(condition, child)
 
-        return forEnd
+        return node_to_return
 
     def parseUnaryOperator(self, parent, unaryOperatorXMLNode, previousNode):
 
         new_unary_op = self.new_node("UnaryOperator", parent)
 
-        if previousNode is not None:
-            previousNode.children.append(new_unary_op)
-        self.parseNode(new_unary_op, unaryOperatorXMLNode)
-        return None
+        node_to_return = new_unary_op
+        for child in unaryOperatorXMLNode:
+            node_to_return = self.parseNode(new_unary_op, child)
+        return node_to_return
 
     def parseFunction(self, functionXMLNode):
         for functionChild in functionXMLNode:
@@ -210,25 +197,25 @@ class ASTAnalyzer(object):
         self.file.children.append(new_function)
         self.endNode.type = "Exit\\n{}".format(functionName)
         self.parseNode(new_function, functionXMLNode)
-        return None
+        return new_function
 
     def parseNode(self, parent, XMLNode):
         node = None
-        for child in XMLNode:
-            if child.tag == "while":
-                node = self.parseWhile(parent, child, node)
-            if child.tag == "if":
-                node = self.parseIf(parent, child, node)
-            if child.tag == "return":
-                node = self.parseReturn(parent, child, node)
-            if child.tag == "unaryOperator":
-                node = self.parseUnaryOperator(parent, child, node)
-            if child.tag == "break":
-                node = self.parseBreak(parent, child, node)
-            if child.tag == "continue":
-                node = self.parseContinue(parent, child, node)
-            if child.tag == "for":
-                node = self.parseFor(parent, child, node)
+        if XMLNode.tag == "while":
+            node = self.parseWhile(parent, XMLNode, node)
+        if XMLNode.tag == "if":
+            node = self.parseIf(parent, XMLNode, node)
+        if XMLNode.tag == "return":
+            node = self.parseReturn(parent, XMLNode, node)
+        if XMLNode.tag == "unaryOperator":
+            node = self.parseUnaryOperator(parent, XMLNode, node)
+        if XMLNode.tag == "break":
+            node = self.parseBreak(parent, XMLNode, node)
+        if XMLNode.tag == "continue":
+            node = self.parseContinue(parent, XMLNode, node)
+        if XMLNode.tag == "for":
+            node = self.parseFor(parent, XMLNode, node)
+        return node
 
 
 if __name__ == "__main__":
