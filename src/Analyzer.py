@@ -25,18 +25,9 @@ class ASTAnalyzer(object):
         self.currentID = 0
         self.file = FileNode()
         self.endNode = BaseNode("end", "")
-        self.counter = {
-            "functions" : 0,
-            "if" : 0,
-            "while" : 0,
-            "return" : 0,
-            "unaryOperator" : 0,
-            "continue" : 0,
-            "condition": 0,
-            "break": 0,
-            "whileEnd": 0,
-            "ifEnd": 0
-        }
+        self.counter = 0
+        self.edges = []
+        self.nodes = []
 
     def load_AST(self):
         self.AST = ET.parse(self.filename)
@@ -94,98 +85,121 @@ class ASTAnalyzer(object):
                 self.parseFunction(child)
         line = "{} [label=\"{}\"]\n".format(self.endNode.name, self.endNode.type)
         for function in self.file.children:
-            line += self.recursiveDump(function)
+            tmp_line = self.recursiveDump(function)
+            line += tmp_line
         print(line)
 
         with open("cfg.dot", "w") as f:
             f.write(self.file.dump(line))
+
+    def new_node(self, label, parent):
+        self.counter += 1
+        node = BaseNode(self.counter, label)
+        parent.children.append(node)
+        node.parent = parent
+        return node
 
     def recursiveDump(self, node):
         line = ""
         if node.name != "end":
             line += node.name + " [label={}]\n".format(node.type)
         for child in node.children:
-            line += "{} -> {}\n".format(node.name, child.name)
+            new_edge = [node.name, child.name]
+            if new_edge not in self.edges:
+                self.edges.append(new_edge)
+                line += "{} -> {}\n".format(node.name, child.name)
+
         for child in node.children:
             line += self.recursiveDump(child)
         return line
 
     def parseWhile(self, parent, whileXMLNode, previousNode):
-        self.counter["while"] += 1
-        new_while = WhileNode(self.counter["while"])
-        parent.children.append(new_while)
+        new_while = self.new_node("WhileBegin", parent)
+
         if previousNode is not None:
             previousNode.children.append(new_while)
-        self.counter["condition"] += 1
-        condition = BaseNode(self.counter["condition"], "Condition")
-        new_while.children.append(condition)
-        whileEnd = BaseNode(self.counter["while"], "whileEnd")
-        condition.children.append(whileEnd)
+
+        condition = self.new_node("Condition", new_while)
+
+        whileEnd = self.new_node("WhileEnd", condition)
+
+        #foundWhileBegin = False
+        #while not foundWhileBegin:
+
         self.parseNode(condition, whileXMLNode)
         return whileEnd
 
     def parseIf(self, parent, ifXMLNode, previousNode):
-        self.counter["if"] += 1
-        new_if = IfNode(self.counter["if"])
-        parent.children.append(new_if)
+
+        new_if = self.new_node("ifBegin", parent)
+
         if previousNode is not None:
             previousNode.children.append(new_if)
-        condition = BaseNode("", "Condition")
-        new_if.children.append(condition)
+
+        # condition
+        condition = self.new_node("Condition", new_if)
+
+        ifEnd = self.new_node("ifEnd", condition)
+
         self.parseNode(condition, ifXMLNode)
-        ifEnd = BaseNode(self.counter["if"], "ifEnd")
-        condition.children.append(ifEnd)
+
         return ifEnd
 
     def parseReturn(self, parent, returnXMLNode, previousNode):
-        self.counter["return"] += 1
-        new_return = ReturnNode(self.counter["return"])
+
+        new_return = self.new_node("return", parent)
+
         if previousNode is not None:
             previousNode.children.append(new_return)
-        parent.children.append(new_return)
+
         new_return.children.append(self.endNode)
         self.parseNode(new_return, returnXMLNode)
+        #TODO: check why returns None
         return None
 
     def parseBreak(self, parent, returnXMLNode, previousNode):
-        self.counter["break"] += 1
-        new_break = BaseNode(self.counter["break"], "break")
+
+        new_break = self.new_node("break", parent)
+
         if previousNode is not None:
             previousNode.children.append(new_break)
-        parent.children.append(new_break)
+
         self.parseNode(new_break, returnXMLNode)
+
         return None
 
     def parseContinue(self, parent, returnXMLNode, previousNode):
-        self.counter["continue"] += 1
-        new_cont = BaseNode(self.counter["continue"], "continue")
+
+        new_continue = self.new_node("continue", parent)
+
         if previousNode is not None:
-            previousNode.children.append(new_cont)
-        parent.children.append(new_cont)
-        self.parseNode(new_cont, returnXMLNode)
+            previousNode.children.append(new_continue)
+
+        self.parseNode(new_continue, returnXMLNode)
         return None
 
     def parseFor(self, parent, XMLNode, previousNode):
-        self.counter["for"] += 1
-        new_for = BaseNode(self.counter["for"], "for")
-        parent.children.append(new_for)
+
+        new_for = self.new_node("for", parent)
+
         if previousNode is not None:
             previousNode.children.append(new_for)
-        self.counter["condition"] += 1
-        condition = BaseNode(self.counter["condition"], "Condition")
-        new_for.children.append(condition)
-        forEnd = BaseNode("", "forEnd")
-        condition.children.append(forEnd)
+
+        condition = self.new_node("Condition", new_for)
+
+        forEnd = self.new_node("forEnd", condition)
+
         self.parseNode(condition, XMLNode)
+
         return forEnd
 
     def parseUnaryOperator(self, parent, unaryOperatorXMLNode, previousNode):
-        self.counter["unaryOperator"] += 1
-        new_op = UnaryOperatorNode(self.counter["unaryOperator"])
-        parent.children.append(new_op)
+
+        new_unary_op = self.new_node("UnaryOperator", parent)
+
         if previousNode is not None:
-            previousNode.children.append(new_op)
-        self.parseNode(new_op, unaryOperatorXMLNode)
+            previousNode.children.append(new_unary_op)
+        self.parseNode(new_unary_op, unaryOperatorXMLNode)
         return None
 
     def parseFunction(self, functionXMLNode):
