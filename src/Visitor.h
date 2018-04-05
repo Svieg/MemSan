@@ -39,6 +39,7 @@ public:
   bool VisitFieldDecl(clang::FieldDecl *D);
   bool VisitContinueStmt(clang::ContinueStmt*);
   bool VisitUnaryOperator(clang::UnaryOperator*);
+  bool VisitBinaryOperator(clang::BinaryOperator*);
 
   // Traverses
   bool TraverseWhileStmt(clang::WhileStmt *S);

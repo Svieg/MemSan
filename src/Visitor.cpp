@@ -36,7 +36,8 @@ bool Visitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *D) {
 /**********************/
 
 bool Visitor::TraverseIfStmt(clang::IfStmt *S) {
-  *getDumpFile()<<"<if>" << std::endl;
+  unsigned int line = context_.getSourceManager().getPresumedLoc(S->getLocStart(), 1).getLine();
+  *getDumpFile()<<"<if>" << line << std::endl;
   clang::RecursiveASTVisitor<Visitor>::TraverseIfStmt(S);
   *getDumpFile()<<"</if>" << std::endl;
 
@@ -145,11 +146,13 @@ bool Visitor::TraverseReturnStmt(clang::ReturnStmt *D) {
     *getDumpFile() << "<return>" << std::endl;
     clang::RecursiveASTVisitor<Visitor>::TraverseReturnStmt(D);
     *getDumpFile() << "</return>" << std::endl;
+  return true;
 }
 
 bool Visitor::VisitContinueStmt(clang::ContinueStmt *D) {
 
     *getDumpFile() << "<continue></continue>" << std::endl;
+  return true;
 
 }
 
@@ -159,11 +162,20 @@ bool Visitor::TraverseForStmt(clang::ForStmt *D) {
     *getDumpFile() << "<for>" << std::endl;
     clang::RecursiveASTVisitor<Visitor>::TraverseForStmt(D);
     *getDumpFile() << "</for>" << std::endl;
+  return true;
 
 }
 
 bool Visitor::VisitUnaryOperator(clang::UnaryOperator *D) {
 
     *getDumpFile() << "<unaryOperator></unaryOperator>" << std::endl;
+  return true;
+
+}
+
+bool Visitor::VisitBinaryOperator(clang::BinaryOperator *D) {
+
+    *getDumpFile() << "<binaryOperator></binaryOperator>" << std::endl;
+  return true;
 
 }

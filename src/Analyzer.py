@@ -11,7 +11,7 @@ from ClassNode import ClassNode
 from MethodNode import MethodNode
 from AttributeNode import AttributeNode
 from BaseNode import BaseNode
-
+from Edge import Edge
 
 class ASTAnalyzer(object):
     """
@@ -28,6 +28,8 @@ class ASTAnalyzer(object):
         self.counter = 0
         self.edges = []
         self.nodes = []
+        self.reversed_edges = []
+        self.tree_nodes = []
 
     def load_AST(self):
         self.AST = ET.parse(self.filename)
@@ -80,13 +82,31 @@ class ASTAnalyzer(object):
         raise
 
     def buildCFG(self):
+
+        # edge case function node
         for child in self.root:
             if child.tag == "function":
                 self.parseFunction(child)
-        line = "{} [label=\"{}\"]\n".format(self.endNode.name, self.endNode.type)
+
+        # Adding node to .dot format
+        line = "{} [label=\"{}\"]\n".format(self.endNode.name, self.endNode.name)
+
+        # DFS for children
         for function in self.file.children:
             tmp_line = self.recursiveDump(function)
             line += tmp_line
+
+        #self.reverse_edges()
+
+        for node in self.nodes:
+            if node.same_level_node is not None:
+                for same_child in node.same_level_node.children:
+                    self.add_edge(node, same_child)
+
+        for node in self.nodes:
+            for child in node.children:
+                line += "{} -> {}\n".format(node.name, child.name)
+
         print(line)
 
         with open("cfg.dot", "w") as f:
@@ -95,41 +115,84 @@ class ASTAnalyzer(object):
     def new_node(self, label, parent):
         self.counter += 1
         node = BaseNode(self.counter, label)
-        parent.children.append(node)
-        node.parent = parent
+        if parent is None:
+            return node
+
+        #if parent.type == "return":
+        #    parent, node = node, parent
+
+        self.nodes.append(node)
+
+        self.add_edge(parent, node)
+
+        self.tree_nodes.append(node)
+
+        node.dom_tree_parent = parent
+
         return node
 
+    def add_edge(self, parent, child):
+        if parent.name == "end":
+            return
+        if parent.type == "return" and child.name != "end":
+            return
+
+        if child not in parent.children:
+            parent.children.append(child)
+
+        if parent not in child.parents:
+            child.parents.append(parent)
+
+        new_edge = Edge(parent, child)
+        if new_edge not in self.edges:
+            self.edges.append(new_edge)
+
     def recursiveDump(self, node):
+
+        if node.visited == True:
+            return ""
+
+        node.visited = True
+
         line = ""
         if node.name != "end":
-            line += node.name + " [label={}]\n".format(node.type)
+            line += node.name + " [label={}]\n".format(node.name)
+
+        previous_child = None
         for child in node.children:
-            new_edge = [node.name, child.name]
-            if new_edge not in self.edges:
-                self.edges.append(new_edge)
-                line += "{} -> {}\n".format(node.name, child.name)
+            if previous_child is not None:
+                self.add_edge(previous_child, child)
+            previous_child = child
 
         for child in node.children:
             line += self.recursiveDump(child)
         return line
 
-    def parseWhile(self, parent, whileXMLNode, previousNode):
-        new_while = self.new_node("WhileBegin", parent)
+    def parseWhile(self, parent, XMLNode, previousNode):
 
-        #if previousNode is not None:
-        #    previousNode.children.append(new_while)
+        new_while = self.new_node("WhileBegin", parent)
 
         condition = self.new_node("Condition", new_while)
 
         whileEnd = self.new_node("WhileEnd", condition)
 
+
         #foundWhileBegin = False
         #while not foundWhileBegin:
 
-        self.parseNode(condition, whileXMLNode)
+        node_to_return = whileEnd
+        new_parent = condition
+        for child in XMLNode:
+            node_to_return = self.parseNode(new_parent, child, new_while)
+            new_parent = node_to_return
+
+        #leafs = condition.getLeafs()
+        #for child in leafs:
+        #    self.add_edge(child, new_while)
+
         return whileEnd
 
-    def parseIf(self, parent, ifXMLNode, previousNode):
+    def parseIf(self, parent, XMLNode, previousNode):
 
         new_if = self.new_node("ifBegin", parent)
 
@@ -138,33 +201,50 @@ class ASTAnalyzer(object):
 
         ifEnd = self.new_node("ifEnd", condition)
 
-        self.parseNode(condition, ifXMLNode)
+        if previousNode is not None:
+            ifEnd.children.append(previousNode)
 
-        return ifEnd
+        node_to_return = ifEnd
+        new_parent = condition
+        for child in XMLNode:
+            node_to_return = self.parseNode(new_parent, child, previousNode)
+            new_parent = node_to_return
 
-    def parseReturn(self, parent, returnXMLNode, previousNode):
+        self.add_edge(ifEnd, node_to_return)
+        #ifEnd.same_level_node = node_to_return
+
+        return node_to_return
+
+    def parseReturn(self, parent, XMLNode, previousNode):
 
         new_return = self.new_node("return", parent)
 
-        new_return.children.append(self.endNode)
-        self.parseNode(new_return, returnXMLNode)
-        #TODO: check why returns None
+        self.add_edge(new_return, self.endNode)
+
+        #node_to_return = new_return
+        #for child in XMLNode:
+        #    node_to_return = self.parseNode(node_to_return, child)
+
         return new_return
 
-    def parseBreak(self, parent, returnXMLNode, previousNode):
+    def parseBreak(self, parent, XMLNode, previousNode):
 
         new_break = self.new_node("break", parent)
 
-        self.parseNode(new_break, returnXMLNode)
+        node_to_return = new_break
+        for child in XMLNode:
+            node_to_return = self.parseNode(node_to_return, child, previousNode)
 
-        return new_break
+        return node_to_return
 
-    def parseContinue(self, parent, returnXMLNode, previousNode):
+    def parseContinue(self, parent, XMLNode, previousNode):
 
         new_continue = self.new_node("continue", parent)
 
-        self.parseNode(new_continue, returnXMLNode)
-        return new_continue
+        node_to_return = new_continue
+        for child in XMLNode:
+            node_to_return = self.parseNode(node_to_return, child, previousNode)
+        return node_to_return
 
     def parseFor(self, parent, XMLNode, previousNode):
 
@@ -175,8 +255,10 @@ class ASTAnalyzer(object):
         forEnd = self.new_node("forEnd", condition)
 
         node_to_return = forEnd
+        new_parent = condition
         for child in XMLNode:
-            node_to_return = self.parseNode(condition, child)
+            node_to_return = self.parseNode(new_parent, child, previousNode)
+            new_parent = node_to_return
 
         return node_to_return
 
@@ -186,21 +268,35 @@ class ASTAnalyzer(object):
 
         node_to_return = new_unary_op
         for child in unaryOperatorXMLNode:
-            node_to_return = self.parseNode(new_unary_op, child)
+            node_to_return = self.parseNode(node_to_return, child, previousNode)
         return node_to_return
 
-    def parseFunction(self, functionXMLNode):
-        for functionChild in functionXMLNode:
+    def parseBinaryOperator(self, parent, binaryOperatorXMLNode, previousNode):
+
+        new_binary_op = self.new_node("BinaryOperator", parent)
+
+        node_to_return = new_binary_op
+        for child in binaryOperatorXMLNode:
+            node_to_return = self.parseNode(node_to_return, child, previousNode)
+        return node_to_return
+
+    def parseFunction(self, XMLNode):
+
+        parent = None
+        for functionChild in XMLNode:
             if functionChild.tag == "functionName":
                 functionName = functionChild.text.strip()
-                new_function = FunctionNode(functionName)
+                new_function = self.new_node(functionName, None)
+                parent = new_function
+            else:
+                parent = self.parseNode(parent, functionChild, None)
+
         self.file.children.append(new_function)
         self.endNode.type = "Exit\\n{}".format(functionName)
-        self.parseNode(new_function, functionXMLNode)
+
         return new_function
 
-    def parseNode(self, parent, XMLNode):
-        node = None
+    def parseNode(self, parent, XMLNode, node):
         if XMLNode.tag == "while":
             node = self.parseWhile(parent, XMLNode, node)
         if XMLNode.tag == "if":
@@ -209,6 +305,8 @@ class ASTAnalyzer(object):
             node = self.parseReturn(parent, XMLNode, node)
         if XMLNode.tag == "unaryOperator":
             node = self.parseUnaryOperator(parent, XMLNode, node)
+        if XMLNode.tag == "binaryOperator":
+            node = self.parseBinaryOperator(parent, XMLNode, node)
         if XMLNode.tag == "break":
             node = self.parseBreak(parent, XMLNode, node)
         if XMLNode.tag == "continue":
@@ -217,9 +315,63 @@ class ASTAnalyzer(object):
             node = self.parseFor(parent, XMLNode, node)
         return node
 
+    def reverse_edges(self):
+        for edge in self.edges:
+            self.reversed_edges.append(Edge(edge.child, edge.parent))
+
+    def reverse_cfg(self):
+        for node in self.nodes:
+            tmp_parents = node.parents
+            node.parents = node.children
+            node.children = tmp_parents
+
+    def nca(self, n1, n2):
+        path = []
+        c = n1
+        while c is not None:
+            path.append(c)
+            c = c.dom_tree_parent
+        c = n2
+        while c is not None and c not in path:
+            c = c.dom_tree_parent
+
+        return c
+
+    def make_dom_tree(self):
+        changed = True
+        while changed:
+            changed = False
+            for node in self.nodes:
+                if len(node.parents) == 0:
+                    continue
+                parent = node.parents[0]
+                for p in node.parents[1:]:
+                    if p not in self.tree_nodes:
+                        continue
+                    parent = self.nca(parent, p)
+                if node.dom_tree_parent != parent:
+                    node.dom_tree_parent = parent
+                    changed = True
+
+
+    def dump_dom_tree(self):
+        line = ""
+        for node in self.nodes:
+            if node.dom_tree_parent is not None:
+                line += "{} -> {}\n".format(node.name, node.dom_tree_parent.name)
+            else:
+                print("{} dom_parent is None".format(node.name))
+
+        print(line)
+
 
 if __name__ == "__main__":
     analyzer = ASTAnalyzer()
     analyzer.load_AST()
     analyzer.get_root_node()
     analyzer.buildCFG()
+    x=1
+    #analyzer.reverse_edges()
+    #analyzer.reverse_cfg()
+    #analyzer.make_dom_tree()
+    #analyzer.dump_dom_tree()
