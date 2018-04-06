@@ -12,6 +12,7 @@ class BaseNode(object):
         self.same_level_node = None
         self.dom = []
         self.pdom = []
+        self.ipdom = None
 
     def visit(self):
         pass

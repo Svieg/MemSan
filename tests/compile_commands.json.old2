@@ -1,0 +1,7 @@
+[
+{
+  "directory":"/home/svieg/school/fourth/6302/MemSan",
+  "command":"/home/svieg/tools/llvm+clang/bin/clang /home/svieg/school/fourth/6302/MemSan/sqlite3.c -I/usr/include -I/usr/include/c++/5/tr1/ -stdlib=libc++ -I/home/svieg/tools/chromium-os/src/aosp/external/libcxx/include/ -I/home/svieg/tools/chromium-os/src/third_party/kernel/v4.4/include/linux/ -I/home/svieg/tools/chromium-os/src/third_party/kernel/v4.4/include/ -I/home/svieg/tools/chromium-os/src/third_party/kernel/v4.4/include/uapi/linux -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5 -I/home/svieg/tools/chromium-os/src/third_party/kernel/v3.8/arch/x86/include",
+  "file":"/home/svieg/school/fourth/6302/MemSan/sqlite3.c"
+}
+]

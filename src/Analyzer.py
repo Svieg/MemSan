@@ -31,7 +31,9 @@ class ASTAnalyzer(object):
         self.endNode = BaseNode("end", "")
         self.counter = 0
         self.edges = []
+        self.edges_cd = []
         self.nodes = []
+        self.nodes_cd = None
         self.reversed_edges = []
         self.tree_nodes = []
         self.dump_cfg = False
@@ -440,6 +442,7 @@ class ASTAnalyzer(object):
                 if len(node.children) == 1:
                     only_parent = node.children[0]
                     if only_parent not in node.pdom:
+                        node.ipdom = node.children[0]
                         node.pdom.append(node.children[0])
                         changed = True
                 else:
@@ -475,7 +478,25 @@ class ASTAnalyzer(object):
         dump_dot("pdom.dot", line)
 
     def build_cd(self):
-        cd = self.nodes
+        self.nodes_cd = self.nodes
+
+        s = []
+        for edge in self.edges:
+            y = edge.child
+            x = edge.parent
+            if y not in x:
+                s.append(edge)
+        for edge in s:
+            y = edge.child
+            x = edge.parent
+            node = y
+            cont = True
+            while cont:
+                self.edges_cd.append(Edge(x, node))
+                node = node.ipdom
+                if node == x.ipdom:
+                    cont = False
+
 
 
 def dump_dot(filename, content):
@@ -509,7 +530,6 @@ if __name__ == "__main__":
     analyzer.load_AST()
     analyzer.get_root_node()
     analyzer.buildCFG()
-    analyzer.algo_dom_tree()
-    #analyzer.make_dom_tree()
-    analyzer.dump_dom_tree()
-    analyzer.dump_pdom_tree()
+    #analyzer.algo_dom_tree()
+    #analyzer.dump_dom_tree()
+    #analyzer.dump_pdom_tree()

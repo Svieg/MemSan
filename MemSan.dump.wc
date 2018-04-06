@@ -1,0 +1,31 @@
+<dump>
+<function> <functionName> main</functionName>
+<var> c </var>
+<var> nw </var>
+<var> inword </var>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<callExpr></callExpr>
+<while>
+<binaryOperator></binaryOperator>
+<if>12
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<if>14
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+<binaryOperator></binaryOperator>
+</if>
+</if>
+<binaryOperator></binaryOperator>
+<callExpr></callExpr>
+</while>
+<callExpr></callExpr>
+</function>
+</dump>
