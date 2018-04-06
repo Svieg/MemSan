@@ -179,3 +179,10 @@ bool Visitor::VisitBinaryOperator(clang::BinaryOperator *D) {
   return true;
 
 }
+
+bool Visitor::VisitCallExpr(clang::CallExpr *D) {
+
+    *getDumpFile() << "<callExpr></callExpr>" << std::endl;
+  return true;
+
+}

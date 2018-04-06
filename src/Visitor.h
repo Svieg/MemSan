@@ -40,6 +40,7 @@ public:
   bool VisitContinueStmt(clang::ContinueStmt*);
   bool VisitUnaryOperator(clang::UnaryOperator*);
   bool VisitBinaryOperator(clang::BinaryOperator*);
+  bool VisitCallExpr(clang::CallExpr*);
 
   // Traverses
   bool TraverseWhileStmt(clang::WhileStmt *S);

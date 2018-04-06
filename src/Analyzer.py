@@ -13,6 +13,10 @@ from AttributeNode import AttributeNode
 from BaseNode import BaseNode
 from Edge import Edge
 
+def intersection(lst1, lst2):
+    lst3 = [value for value in lst1 if value in lst2]
+    return lst3
+
 class ASTAnalyzer(object):
     """
     Takes the AST dumped and calculates metrics from it.
@@ -30,6 +34,7 @@ class ASTAnalyzer(object):
         self.nodes = []
         self.reversed_edges = []
         self.tree_nodes = []
+        self.dump_cfg = False
 
     def load_AST(self):
         self.AST = ET.parse(self.filename)
@@ -102,10 +107,14 @@ class ASTAnalyzer(object):
             if node.same_level_node is not None:
                 for same_child in node.same_level_node.children:
                     self.add_edge(node, same_child)
+        if self.dump_cfg:
+            for node in self.nodes:
+                for child in node.children:
+                    line += "{} -> {}\n".format(node.name, child.name)
 
         for node in self.nodes:
-            for child in node.children:
-                line += "{} -> {}\n".format(node.name, child.name)
+            if len(node.children) == 0:
+                self.add_edge(node, self.endNode)
 
         print(line)
 
@@ -158,11 +167,11 @@ class ASTAnalyzer(object):
         if node.name != "end":
             line += node.name + " [label={}]\n".format(node.name)
 
-        previous_child = None
-        for child in node.children:
-            if previous_child is not None:
-                self.add_edge(previous_child, child)
-            previous_child = child
+       # previous_child = None
+       # for child in node.children:
+       #     if previous_child is not None:
+       #         self.add_edge(previous_child, child)
+       #     previous_child = child
 
         for child in node.children:
             line += self.recursiveDump(child)
@@ -280,6 +289,15 @@ class ASTAnalyzer(object):
             node_to_return = self.parseNode(node_to_return, child, previousNode)
         return node_to_return
 
+    def parseCall(self, parent, callXMLNode, previousNode):
+
+        call = self.new_node("callExpr", parent)
+
+        node_to_return = call
+        for child in callXMLNode:
+            node_to_return = self.parseNode(node_to_return, child, previousNode)
+        return node_to_return
+
     def parseFunction(self, XMLNode):
 
         parent = None
@@ -297,10 +315,13 @@ class ASTAnalyzer(object):
         return new_function
 
     def parseNode(self, parent, XMLNode, node):
+        node = parent
         if XMLNode.tag == "while":
             node = self.parseWhile(parent, XMLNode, node)
         if XMLNode.tag == "if":
             node = self.parseIf(parent, XMLNode, node)
+        if XMLNode.tag == "callExpr":
+            node = self.parseCall(parent, XMLNode, node)
         if XMLNode.tag == "return":
             node = self.parseReturn(parent, XMLNode, node)
         if XMLNode.tag == "unaryOperator":
@@ -328,12 +349,20 @@ class ASTAnalyzer(object):
     def nca(self, n1, n2):
         path = []
         c = n1
+        i = 0
         while c is not None:
             path.append(c)
             c = c.dom_tree_parent
+            if i == 100:
+                break
+            i += 1
         c = n2
+        i = 0
         while c is not None and c not in path:
             c = c.dom_tree_parent
+            if i == 100:
+                break
+            i += 1
 
         return c
 
@@ -353,16 +382,126 @@ class ASTAnalyzer(object):
                     node.dom_tree_parent = parent
                     changed = True
 
+    # Algo inspire du cours
+    # Je ne sais pas comment ressortir le graph apres cependant
+    def algo_dom_tree(self):
+        changed = True
+
+        entry = self.file.children[0]
+
+        entry.dom = entry
+
+        for node in self.nodes:
+            if node == entry:
+                continue
+            node.dom.append(node)
+
+        while changed:
+            changed = False
+            for node in self.nodes:
+                if len(node.parents) == 0:
+                    continue
+                if len(node.parents) == 1:
+                    only_parent = node.parents[0]
+                    if only_parent not in node.dom:
+                        node.dom.append(node.parents[0])
+                        changed = True
+                else:
+                    before = node.dom
+                    itDom = node.parents[0].dom
+                    for i in range(1, len(node.parents)):
+                        parent = node.parents[i]
+                        itDom = intersection(itDom, parent.dom)
+                    node.dom = itDom
+                    if len(node.dom) != len(before):
+                        changed = True
+                    for dom in node.dom:
+                        if dom not in before: # same size but diff nodes
+                            changed = True
+        return
+
+    def make_pdom_tree(self):
+        changed = True
+
+        end = self.endNode
+
+        end.pdom = end
+
+        for node in self.nodes:
+            if node == end:
+                continue
+            node.pdom.append(node)
+
+        while changed:
+            changed = False
+            for node in self.nodes:
+                if len(node.children) == 0:
+                    continue
+                if len(node.children) == 1:
+                    only_parent = node.children[0]
+                    if only_parent not in node.pdom:
+                        node.pdom.append(node.children[0])
+                        changed = True
+                else:
+                    before = node.pdom
+                    itDom = node.children[0].pdom
+                    for i in range(1, len(node.children)):
+                        parent = node.children[i]
+                        itDom = intersection(itDom, parent.pdom)
+                    node.pdom = itDom
+                    if len(node.pdom) != len(before):
+                        changed = True
+                    for dom in node.pdom:
+                        if dom not in before:  # same size but diff nodes
+                            changed = True
+        return
 
     def dump_dom_tree(self):
         line = ""
         for node in self.nodes:
-            if node.dom_tree_parent is not None:
-                line += "{} -> {}\n".format(node.name, node.dom_tree_parent.name)
-            else:
-                print("{} dom_parent is None".format(node.name))
+            line += node.name + " [label={}]\n".format(node.name)
+            for dom in node.dom:
+                if dom != node:
+                    line += "{} -> {}\n".format(node.name, dom.name)
+        dump_dot("dom.dot", line)
 
+    def dump_pdom_tree(self):
+        line = ""
+        for node in self.nodes:
+            line += node.name + " [label={}]\n".format(node.name)
+            for pdom in node.pdom:
+                if pdom != node:
+                    line += "{} -> {}\n".format(node.name, pdom.name)
+        dump_dot("pdom.dot", line)
+
+    def build_cd(self):
+        cd = self.nodes
+
+
+def dump_dot(filename, content):
+    with open(filename, "w") as f:
+        line = """
+        digraph G {
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+
+                node [
+                        fontname = "Bitstream Vera Sans"
+                        fontsize = 8
+                        shape = "record"
+                ]
+
+                edge [
+                        fontname = "Bitstream Vera Sans"
+                        fontsize = 8
+                ] \n
+
+        """
+        line += content
+        line += "\n}"
         print(line)
+        f.write(line)
+
 
 
 if __name__ == "__main__":
@@ -370,8 +509,7 @@ if __name__ == "__main__":
     analyzer.load_AST()
     analyzer.get_root_node()
     analyzer.buildCFG()
-    x=1
-    #analyzer.reverse_edges()
-    #analyzer.reverse_cfg()
+    analyzer.algo_dom_tree()
     #analyzer.make_dom_tree()
-    #analyzer.dump_dom_tree()
+    analyzer.dump_dom_tree()
+    analyzer.dump_pdom_tree()

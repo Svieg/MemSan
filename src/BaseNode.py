@@ -10,6 +10,8 @@ class BaseNode(object):
         self.visited = False
         self.dom_tree_parent = None
         self.same_level_node = None
+        self.dom = []
+        self.pdom = []
 
     def visit(self):
         pass
