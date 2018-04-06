@@ -126,15 +126,10 @@ class ASTAnalyzer(object):
     def new_node(self, label, parent):
         self.counter += 1
         node = BaseNode(self.counter, label)
-        if parent is None:
-            return node
-
-        #if parent.type == "return":
-        #    parent, node = node, parent
 
         self.nodes.append(node)
-
-        self.add_edge(parent, node)
+        if parent is not None:
+            self.add_edge(parent, node)
 
         self.tree_nodes.append(node)
 
@@ -231,6 +226,9 @@ class ASTAnalyzer(object):
         new_return = self.new_node("return", parent)
 
         self.add_edge(new_return, self.endNode)
+
+        if self.endNode not in self.nodes:
+            self.nodes.append(self.endNode)
 
         #node_to_return = new_return
         #for child in XMLNode:
@@ -391,7 +389,7 @@ class ASTAnalyzer(object):
 
         entry = self.file.children[0]
 
-        entry.dom = entry
+        entry.dom.append(entry)
 
         for node in self.nodes:
             if node == entry:
@@ -414,7 +412,7 @@ class ASTAnalyzer(object):
                     for i in range(1, len(node.parents)):
                         parent = node.parents[i]
                         itDom = intersection(itDom, parent.dom)
-                    node.dom = itDom
+                    node.dom.append(itDom)
                     if len(node.dom) != len(before):
                         changed = True
                     for dom in node.dom:
@@ -451,7 +449,7 @@ class ASTAnalyzer(object):
                     for i in range(1, len(node.children)):
                         parent = node.children[i]
                         itDom = intersection(itDom, parent.pdom)
-                    node.pdom = itDom
+                    node.pdom.append(itDom)
                     if len(node.pdom) != len(before):
                         changed = True
                     for dom in node.pdom:
@@ -464,6 +462,8 @@ class ASTAnalyzer(object):
         for node in self.nodes:
             line += node.name + " [label={}]\n".format(node.name)
             for dom in node.dom:
+                if dom == []:
+                    continue
                 if dom != node:
                     line += "{} -> {}\n".format(node.name, dom.name)
         dump_dot("dom.dot", line)
@@ -473,6 +473,8 @@ class ASTAnalyzer(object):
         for node in self.nodes:
             line += node.name + " [label={}]\n".format(node.name)
             for pdom in node.pdom:
+                if pdom == []:
+                    continue
                 if pdom != node:
                     line += "{} -> {}\n".format(node.name, pdom.name)
         dump_dot("pdom.dot", line)
