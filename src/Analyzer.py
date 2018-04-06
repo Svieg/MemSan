@@ -36,7 +36,7 @@ class ASTAnalyzer(object):
         self.nodes_cd = None
         self.reversed_edges = []
         self.tree_nodes = []
-        self.dump_cfg = False
+        self.dump_cfg = True
 
     def load_AST(self):
         self.AST = ET.parse(self.filename)
@@ -537,9 +537,9 @@ if __name__ == "__main__":
     analyzer.load_AST()
     analyzer.get_root_node()
     analyzer.buildCFG()
-    #analyzer.make_dom_tree()
-    #analyzer.dump_dom_tree()
-    #analyzer.make_pdom_tree()
-    #analyzer.dump_pdom_tree()
-    #analyzer.build_cd()
-    #analyzer.dump_cd_tree()
+    analyzer.make_dom_tree()
+    analyzer.dump_dom_tree()
+    analyzer.make_pdom_tree()
+    analyzer.dump_pdom_tree()
+    analyzer.build_cd()
+    analyzer.dump_cd_tree()
