@@ -368,7 +368,7 @@ class ASTAnalyzer(object):
 
         return c
 
-    def make_dom_tree(self):
+    def java_dom_tree(self):
         changed = True
         while changed:
             changed = False
@@ -386,7 +386,7 @@ class ASTAnalyzer(object):
 
     # Algo inspire du cours
     # Je ne sais pas comment ressortir le graph apres cependant
-    def algo_dom_tree(self):
+    def make_dom_tree(self):
         changed = True
 
         entry = self.file.children[0]
@@ -484,7 +484,7 @@ class ASTAnalyzer(object):
         for edge in self.edges:
             y = edge.child
             x = edge.parent
-            if y not in x:
+            if y not in x.pdom:
                 s.append(edge)
         for edge in s:
             y = edge.child
@@ -497,6 +497,13 @@ class ASTAnalyzer(object):
                 if node == x.ipdom:
                     cont = False
 
+    def dump_cd_tree(self):
+        line = ""
+        for node in self.nodes_cd:
+            line += node.name + " [label={}]\n".format(node.name)
+            for edge in self.edges_cd:
+                line += "{} -> {}\n".format(edge.parent, edge.child)
+        dump_dot("cd.dot", line)
 
 
 def dump_dot(filename, content):
@@ -530,6 +537,9 @@ if __name__ == "__main__":
     analyzer.load_AST()
     analyzer.get_root_node()
     analyzer.buildCFG()
-    #analyzer.algo_dom_tree()
+    #analyzer.make_dom_tree()
     #analyzer.dump_dom_tree()
+    #analyzer.make_pdom_tree()
     #analyzer.dump_pdom_tree()
+    #analyzer.build_cd()
+    #analyzer.dump_cd_tree()
