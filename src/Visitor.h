@@ -44,6 +44,7 @@ public:
 
   // Traverses
   bool TraverseWhileStmt(clang::WhileStmt *S);
+  bool TraverseConditionalOperator(clang::ConditionalOperator *S);
   bool TraverseIfStmt(clang::IfStmt *S);
   bool TraverseCXXMethodDecl(clang::CXXMethodDecl *D);
   bool TraverseCXXRecordDecl(clang::CXXRecordDecl *D);

@@ -13,6 +13,9 @@ class BaseNode(object):
         self.dom = []
         self.pdom = []
         self.ipdom = None
+        self.line = None
+        self.operator = None
+        self.label = None
 
     def visit(self):
         pass

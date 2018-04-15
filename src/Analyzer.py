@@ -103,12 +103,10 @@ class ASTAnalyzer(object):
             tmp_line = self.recursiveDump(function)
             line += tmp_line
 
-        #self.reverse_edges()
-
-        for node in self.nodes:
-            if node.same_level_node is not None:
-                for same_child in node.same_level_node.children:
-                    self.add_edge(node, same_child)
+        #for node in self.nodes:
+        #    if node.same_level_node is not None:
+        #        for same_child in node.same_level_node.children:
+        #            self.add_edge(node, same_child)
         if self.dump_cfg:
             for node in self.nodes:
                 for child in node.children:
@@ -155,20 +153,17 @@ class ASTAnalyzer(object):
 
     def recursiveDump(self, node):
 
-        if node.visited == True:
+        if node.visited:
             return ""
 
         node.visited = True
 
-        line = ""
-        if node.name != "end":
-            line += node.name + " [label={}]\n".format(node.name)
 
-       # previous_child = None
-       # for child in node.children:
-       #     if previous_child is not None:
-       #         self.add_edge(previous_child, child)
-       #     previous_child = child
+        line = ""
+        if node.label is None:
+            node.label = node.name
+
+        line += "\"{}\" [label=\"{}\"]\n".format(node.name, node.label)
 
         for child in node.children:
             line += self.recursiveDump(child)
@@ -182,33 +177,30 @@ class ASTAnalyzer(object):
 
         whileEnd = self.new_node("WhileEnd", condition)
 
-
-        #foundWhileBegin = False
-        #while not foundWhileBegin:
-
         node_to_return = whileEnd
         new_parent = condition
         for child in XMLNode:
             node_to_return = self.parseNode(new_parent, child, new_while)
             new_parent = node_to_return
 
-        #leafs = condition.getLeafs()
-        #for child in leafs:
-        #    self.add_edge(child, new_while)
+        self.add_edge(node_to_return, condition)
 
         return whileEnd
 
     def parseIf(self, parent, XMLNode, previousNode):
 
-        new_if = self.new_node("ifBegin", parent)
+        line_nb = XMLNode.text.strip()
+        name = "ifBegin"
+        new_if = self.new_node(name, parent)
+        new_if.label = line_nb + ":" + name
 
         # condition
-        condition = self.new_node("Condition", new_if)
+        name = "Condition"
+        condition = self.new_node(name, new_if)
 
-        ifEnd = self.new_node("ifEnd", condition)
-
-        if previousNode is not None:
-            ifEnd.children.append(previousNode)
+        name = "ifEnd"
+        ifEnd = self.new_node(name, condition)
+        ifEnd.label = line_nb + ":" + name
 
         node_to_return = ifEnd
         new_parent = condition
@@ -216,10 +208,9 @@ class ASTAnalyzer(object):
             node_to_return = self.parseNode(new_parent, child, previousNode)
             new_parent = node_to_return
 
-        self.add_edge(ifEnd, node_to_return)
-        #ifEnd.same_level_node = node_to_return
+        self.add_edge(node_to_return, ifEnd)
 
-        return node_to_return
+        return ifEnd
 
     def parseReturn(self, parent, XMLNode, previousNode):
 
@@ -229,10 +220,6 @@ class ASTAnalyzer(object):
 
         if self.endNode not in self.nodes:
             self.nodes.append(self.endNode)
-
-        #node_to_return = new_return
-        #for child in XMLNode:
-        #    node_to_return = self.parseNode(node_to_return, child)
 
         return new_return
 
@@ -283,6 +270,13 @@ class ASTAnalyzer(object):
     def parseBinaryOperator(self, parent, binaryOperatorXMLNode, previousNode):
 
         new_binary_op = self.new_node("BinaryOperator", parent)
+        text = binaryOperatorXMLNode.text
+
+        text = text.split(':')
+        new_binary_op.line = text[0]
+        new_binary_op.operator = text[1]
+        new_binary_op.label = "{}:{}".format(text[0],new_binary_op.name)
+
 
         node_to_return = new_binary_op
         for child in binaryOperatorXMLNode:
@@ -292,6 +286,7 @@ class ASTAnalyzer(object):
     def parseCall(self, parent, callXMLNode, previousNode):
 
         call = self.new_node("callExpr", parent)
+        call.label = callXMLNode.text
 
         node_to_return = call
         for child in callXMLNode:
@@ -309,6 +304,7 @@ class ASTAnalyzer(object):
             else:
                 parent = self.parseNode(parent, functionChild, None)
 
+        self.add_edge(parent, self.endNode)
         self.file.children.append(new_function)
         self.endNode.type = "Exit\\n{}".format(functionName)
 
@@ -541,7 +537,7 @@ if __name__ == "__main__":
     analyzer.buildCFG()
     analyzer.make_dom_tree()
     analyzer.dump_dom_tree()
-    analyzer.make_pdom_tree()
-    analyzer.dump_pdom_tree()
-    analyzer.build_cd()
-    analyzer.dump_cd_tree()
+    #analyzer.make_pdom_tree()
+    #analyzer.dump_pdom_tree()
+    #analyzer.build_cd()
+    #analyzer.dump_cd_tree()
