@@ -9,7 +9,7 @@ class BaseNode(object):
         self.type = type
         self.visited = False
         self.dom_tree_parent = None
-        self.same_level_node = None
+        self.pdom_tree_parent = None
         self.dom = []
         self.pdom = []
         self.ipdom = None
@@ -39,7 +39,7 @@ class BaseNode(object):
     def __ne__(self, other):
 
         if other is None:
-            return
+            return True
 
         if self.name == other.name:
             return False

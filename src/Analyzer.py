@@ -362,6 +362,45 @@ class ASTAnalyzer(object):
 
         return c
 
+    def nca_pdom(self, n1, n2):
+        path = []
+        c = n1
+        i = 0
+        while c is not None:
+            path.append(c)
+            c = c.pdom_tree_parent
+            if i == 100:
+                break
+            i += 1
+        c = n2
+        i = 0
+        while c is not None and c not in path:
+            c = c.pdom_tree_parent
+            if i == 100:
+                break
+            i += 1
+
+        return c
+
+    def java_pdom_tree(self):
+        self.reverse_edges()
+        self.reverse_cfg()
+        changed = True
+        while changed:
+            changed = False
+            for node in self.nodes:
+                if len(node.parents) == 0:
+                    continue
+                parent = node.parents[0]
+                for p in node.parents[1:]:
+                    if p not in self.tree_nodes:
+                        continue
+                    parent = self.nca_pdom(parent, p)
+                dbg = node.pdom_tree_parent
+                if parent != node.pdom_tree_parent:
+                    node.pdom_tree_parent = parent
+                    changed = True
+
     def java_dom_tree(self):
         changed = True
         while changed:
@@ -378,102 +417,31 @@ class ASTAnalyzer(object):
                     node.dom_tree_parent = parent
                     changed = True
 
-    # Algo inspire du cours
-    # Je ne sais pas comment ressortir le graph apres cependant
-    def make_dom_tree(self):
-        changed = True
-
-        entry = self.file.children[0]
-
-        entry.dom.append(entry)
-
-        for node in self.nodes:
-            if node == entry:
-                continue
-            node.dom.append(node)
-
-        while changed:
-            changed = False
-            for node in self.nodes:
-                if len(node.parents) == 0:
-                    continue
-                if len(node.parents) == 1:
-                    only_parent = node.parents[0]
-                    if only_parent not in node.dom:
-                        node.dom.append(node.parents[0])
-                        changed = True
-                else:
-                    before = node.dom
-                    itDom = node.parents[0].dom
-                    for i in range(1, len(node.parents)):
-                        parent = node.parents[i]
-                        itDom = intersection(itDom, parent.dom)
-                    node.dom.append(itDom)
-                    if len(node.dom) != len(before):
-                        changed = True
-                    for dom in node.dom:
-                        if dom not in before: # same size but diff nodes
-                            changed = True
-        return
-
-    def make_pdom_tree(self):
-        changed = True
-
-        end = self.endNode
-
-        end.pdom = end
-
-        for node in self.nodes:
-            if node == end:
-                continue
-            node.pdom.append(node)
-
-        while changed:
-            changed = False
-            for node in self.nodes:
-                if len(node.children) == 0:
-                    continue
-                if len(node.children) == 1:
-                    only_parent = node.children[0]
-                    if only_parent not in node.pdom:
-                        node.ipdom = node.children[0]
-                        node.pdom.append(node.children[0])
-                        changed = True
-                else:
-                    before = node.pdom
-                    itDom = node.children[0].pdom
-                    for i in range(1, len(node.children)):
-                        parent = node.children[i]
-                        itDom = intersection(itDom, parent.pdom)
-                    node.pdom.append(itDom)
-                    if len(node.pdom) != len(before):
-                        changed = True
-                    for dom in node.pdom:
-                        if dom not in before:  # same size but diff nodes
-                            changed = True
-        return
-
-    def dump_dom_tree(self):
+    def java_dump_dom(self):
         line = ""
         for node in self.nodes:
-            line += node.name + " [label={}]\n".format(node.name)
-            for dom in node.dom:
-                if dom == []:
-                    continue
-                if dom != node:
-                    line += "{} -> {}\n".format(node.name, dom.name)
+            line += node.name + " [label=\"{}\"]\n".format(node.label)
+            if node.dom_tree_parent != node and node.dom_tree_parent is not None:
+                line += "{} -> {}\n".format(node.dom_tree_parent.name, node.name)
         dump_dot("dom.dot", line)
 
-    def dump_pdom_tree(self):
+    def java_dump_pdom(self):
         line = ""
         for node in self.nodes:
-            line += node.name + " [label={}]\n".format(node.name)
-            for pdom in node.pdom:
-                if pdom == []:
-                    continue
-                if pdom != node:
-                    line += "{} -> {}\n".format(node.name, pdom.name)
+            line += node.name + " [label=\"{}\"]\n".format(node.label)
+            if node.pdom_tree_parent != node and node.pdom_tree_parent is not None:
+                line += "{} -> {}\n".format(node.pdom_tree_parent.name, node.name)
         dump_dot("pdom.dot", line)
+
+    def check_pdom(self, node1, node2):
+        """ Checks if n1 pdom's n2"""
+        pdom_parent = node2.pdom_tree_parent
+        while pdom_parent:
+            if pdom_parent == node1:
+                return True
+            pdom_parent = pdom_parent.pdom_tree_parent
+        return False
+
 
     def build_cd(self):
         self.nodes_cd = self.nodes
@@ -482,7 +450,7 @@ class ASTAnalyzer(object):
         for edge in self.edges:
             y = edge.child
             x = edge.parent
-            if y not in x.pdom:
+            if self.check_pdom(x, y):
                 s.append(edge)
         for edge in s:
             y = edge.child
@@ -490,17 +458,22 @@ class ASTAnalyzer(object):
             node = y
             cont = True
             while cont:
-                self.edges_cd.append(Edge(x, node))
-                node = node.ipdom
-                if node == x.ipdom:
+                new_edge = Edge(x, node)
+                if new_edge not in self.edges_cd:
+                    self.edges_cd.append(new_edge)
+                if node.pdom_tree_parent is None:
+                    break
+                node = node.pdom_tree_parent
+                if node == x.pdom_tree_parent:
                     cont = False
+        return
 
     def dump_cd_tree(self):
         line = ""
         for node in self.nodes_cd:
-            line += node.name + " [label={}]\n".format(node.name)
-            for edge in self.edges_cd:
-                line += "{} -> {}\n".format(edge.parent, edge.child)
+            line += node.name + " [label=\"{}\"]\n".format(node.name)
+        for edge in self.edges_cd:
+            line += "{} -> {}\n".format(edge.parent, edge.child)
         dump_dot("cd.dot", line)
 
 
@@ -535,9 +508,9 @@ if __name__ == "__main__":
     analyzer.load_AST()
     analyzer.get_root_node()
     analyzer.buildCFG()
-    analyzer.make_dom_tree()
-    analyzer.dump_dom_tree()
-    #analyzer.make_pdom_tree()
-    #analyzer.dump_pdom_tree()
-    #analyzer.build_cd()
-    #analyzer.dump_cd_tree()
+    analyzer.java_dom_tree()
+    analyzer.java_dump_dom()
+    analyzer.java_pdom_tree()
+    analyzer.java_dump_pdom()
+    analyzer.build_cd()
+    analyzer.dump_cd_tree()

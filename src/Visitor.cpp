@@ -194,7 +194,24 @@ bool Visitor::VisitUnaryOperator(clang::UnaryOperator *D) {
 bool Visitor::VisitBinaryOperator(clang::BinaryOperator *D) {
 
     unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
-    *getDumpFile() << "<binaryOperator>" << line << ":" << D->getOpcodeStr().data() << "</binaryOperator>" << std::endl;
+    *getDumpFile() << "<binaryOperator>" << line << ":" << D->getOpcodeStr().data()  << ":";
+
+    if (D->isAssignmentOp()) {
+        clang::Expr* lhs = D->getLHS();
+        if (clang::DeclRefExpr *DRE = llvm::dyn_cast<clang::DeclRefExpr>(lhs)) {
+            if (clang::VarDecl *VD = llvm::dyn_cast<clang::VarDecl>(DRE->getDecl())) {
+                *getDumpFile() << ":" << VD->getQualifiedNameAsString();
+            }
+        }
+        clang::Expr* rhs = D->getRHS();
+        if (clang::DeclRefExpr *DRE = llvm::dyn_cast<clang::DeclRefExpr>(rhs)) {
+            if (clang::VarDecl *VD = llvm::dyn_cast<clang::VarDecl>(DRE->getDecl())) {
+                *getDumpFile() << ":" << VD->getQualifiedNameAsString();
+            }
+        }
+    }
+
+    *getDumpFile() << "</binaryOperator>" << std::endl;
     return true;
 
 }
