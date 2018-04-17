@@ -1,0 +1,3 @@
+/home/svieg/school/fourth/6302/MemSan/tp2/CMakeFiles/edit_cache.dir
+/home/svieg/school/fourth/6302/MemSan/tp2/CMakeFiles/rebuild_cache.dir
+/home/svieg/school/fourth/6302/MemSan/tp2/CMakeFiles/LOG6302.dir
