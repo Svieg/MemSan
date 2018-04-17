@@ -2,16 +2,12 @@
 
 import xml.etree.ElementTree as ET
 from FileNode import FileNode
-from WhileNode import WhileNode
-from FunctionNode import FunctionNode
-from IfNode import IfNode
-from ReturnNode import ReturnNode
-from UnaryOperatorNode import UnaryOperatorNode
 from ClassNode import ClassNode
 from MethodNode import MethodNode
 from AttributeNode import AttributeNode
 from BaseNode import BaseNode
 from Edge import Edge
+from metrics import get_metrics
 
 def intersection(lst1, lst2):
     lst3 = [value for value in lst1 if value in lst2]
@@ -32,6 +28,7 @@ class ASTAnalyzer(object):
         self.counter = 0
         self.edges = []
         self.edges_cd = []
+        self.edges_dd = []
         self.nodes = []
         self.nodes_cd = None
         self.reversed_edges = []
@@ -44,9 +41,8 @@ class ASTAnalyzer(object):
     def get_root_node(self):
         self.root = self.AST.getroot()
 
-    def append_to_output(self, str_to_append):
-        with open(self.output_filename, "a") as f:
-            f.write(str_to_append)
+    def get_root(self):
+        return self.root
 
     def parse_class(self):
         for child in self.root:
@@ -85,9 +81,6 @@ class ASTAnalyzer(object):
         with open(self.output_filename, "w") as f:
             f.write(str(self.file))
 
-    def getFilename(self):
-        raise
-
     def buildCFG(self):
 
         # edge case function node
@@ -103,10 +96,6 @@ class ASTAnalyzer(object):
             tmp_line = self.recursiveDump(function)
             line += tmp_line
 
-        #for node in self.nodes:
-        #    if node.same_level_node is not None:
-        #        for same_child in node.same_level_node.children:
-        #            self.add_edge(node, same_child)
         if self.dump_cfg:
             for node in self.nodes:
                 for child in node.children:
@@ -443,6 +432,9 @@ class ASTAnalyzer(object):
         return False
 
 
+    def build_dd(self):
+        """ Builds data dependency"""
+
     def build_cd(self):
         self.nodes_cd = self.nodes
 
@@ -450,7 +442,7 @@ class ASTAnalyzer(object):
         for edge in self.edges:
             y = edge.child
             x = edge.parent
-            if self.check_pdom(x, y):
+            if not self.check_pdom(x, y):
                 s.append(edge)
         for edge in s:
             y = edge.child
@@ -507,6 +499,10 @@ if __name__ == "__main__":
     analyzer = ASTAnalyzer()
     analyzer.load_AST()
     analyzer.get_root_node()
+
+    #tp1
+    get_metrics(analyzer.get_root())
+
     analyzer.buildCFG()
     analyzer.java_dom_tree()
     analyzer.java_dump_dom()
