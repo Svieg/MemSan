@@ -113,7 +113,6 @@ int main(int argc, const char **argv) {
     for (unsigned int i = 1; i < argc; ++i) {
       CommandLine.push_back(std::string(argv[i]));
     }
-    CommandLine.push_back("-I/usr/include");
 
     clang::tooling::ToolInvocation invocation(
       std::move(CommandLine),

@@ -32,6 +32,7 @@ public:
   }
 
   std::ofstream* getDumpFile() {return _dumpFile;}
+  std::string convertExpressionToString(clang::Expr *E);
 
   // Visites
   bool VisitBreakStmt(clang::BreakStmt *S);

@@ -1,0 +1,30 @@
+
+digraph G {
+        fontname = "Bitstream Vera Sans"
+        fontsize = 8
+
+        node [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+                shape = "record"
+        ]
+
+        edge [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+        ] 
+
+NoMethods_UsesChildClass [
+		label = "{ NoMethods_UsesChildClass|- childClassAttribute :  ChildClass\l|}"
+	]
+
+NoMethods_UsesChildClass ->  ChildClass
+BaseClass [
+		label = "{ BaseClass|- privateAttribute : long\l- count : int\l|- returns_void_pointer() : void *\l}"
+	]
+ChildClass [
+		label = "{ ChildClass:: BaseClass|- x : int\l|- bar() : int\l}"
+	]
+ChildClass ->  BaseClass [arrowhead = "empty"]
+
+}

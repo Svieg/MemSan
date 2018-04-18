@@ -1,5 +1,17 @@
 #include "Visitor.h"
 
+// https://stackoverflow.com/questions/37962160/retrieve-lhs-rhs-value-of-operator
+std::string Visitor::convertExpressionToString(clang::Expr *E) {
+  clang::SourceManager &SM = context_.getSourceManager();
+  clang::LangOptions lopt;
+
+  clang::SourceLocation startLoc = E->getLocStart();
+  clang::SourceLocation _endLoc = E->getLocEnd();
+  clang::SourceLocation endLoc = clang::Lexer::getLocForEndOfToken(_endLoc, 0, SM, lopt);
+
+  return std::string(SM.getCharacterData(startLoc), SM.getCharacterData(endLoc) - SM.getCharacterData(startLoc));
+}
+
 /**********************/
 /* C++ Class traverse */
 /**********************/
@@ -194,21 +206,23 @@ bool Visitor::VisitUnaryOperator(clang::UnaryOperator *D) {
 bool Visitor::VisitBinaryOperator(clang::BinaryOperator *D) {
 
     unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
-    *getDumpFile() << "<binaryOperator>" << line << ":" << D->getOpcodeStr().data()  << ":";
+    *getDumpFile() << "<binaryOperator>" << line;
+
+    std::string op = D->getOpcodeStr().data();
+    if (op == "=") {
+        *getDumpFile() << ":" << op;
+    }
 
     if (D->isAssignmentOp()) {
         clang::Expr* lhs = D->getLHS();
         if (clang::DeclRefExpr *DRE = llvm::dyn_cast<clang::DeclRefExpr>(lhs)) {
             if (clang::VarDecl *VD = llvm::dyn_cast<clang::VarDecl>(DRE->getDecl())) {
-                *getDumpFile() << ":" << VD->getQualifiedNameAsString();
+                std::string var = VD->getQualifiedNameAsString();
+                *getDumpFile() << ":" << var;
             }
         }
         clang::Expr* rhs = D->getRHS();
-        if (clang::DeclRefExpr *DRE = llvm::dyn_cast<clang::DeclRefExpr>(rhs)) {
-            if (clang::VarDecl *VD = llvm::dyn_cast<clang::VarDecl>(DRE->getDecl())) {
-                *getDumpFile() << ":" << VD->getQualifiedNameAsString();
-            }
-        }
+        *getDumpFile() << ":" << convertExpressionToString(rhs);
     }
 
     *getDumpFile() << "</binaryOperator>" << std::endl;

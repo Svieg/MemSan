@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import sys
 import xml.etree.ElementTree as ET
 from FileNode import FileNode
 from ClassNode import ClassNode
@@ -104,8 +105,6 @@ class ASTAnalyzer(object):
         for node in self.nodes:
             if len(node.children) == 0:
                 self.add_edge(node, self.endNode)
-
-        print(line)
 
         with open("cfg.dot", "w") as f:
             f.write(self.file.dump(line))
@@ -385,7 +384,6 @@ class ASTAnalyzer(object):
                     if p not in self.tree_nodes:
                         continue
                     parent = self.nca_pdom(parent, p)
-                dbg = node.pdom_tree_parent
                 if parent != node.pdom_tree_parent:
                     node.pdom_tree_parent = parent
                     changed = True
@@ -490,7 +488,6 @@ def dump_dot(filename, content):
         """
         line += content
         line += "\n}"
-        print(line)
         f.write(line)
 
 
@@ -501,7 +498,8 @@ if __name__ == "__main__":
     analyzer.get_root_node()
 
     #tp1
-    get_metrics(analyzer.get_root())
+    if len(sys.argv) == 2 and sys.argv[1] == "-tp1":
+        get_metrics(analyzer.get_root())
 
     analyzer.buildCFG()
     analyzer.java_dom_tree()
