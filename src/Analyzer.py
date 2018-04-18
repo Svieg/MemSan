@@ -432,6 +432,7 @@ class ASTAnalyzer(object):
 
     def build_dd(self):
         """ Builds data dependency"""
+        raise
 
     def build_cd(self):
         self.nodes_cd = self.nodes

@@ -1,5 +1,5 @@
-def append_to_output(self, str_to_append, filename):
-    with open(filename, "a") as f:
+def append_to_output(str_to_append, filename):
+    with open(filename, "w") as f:
         f.write(str_to_append)
 
 def get_metrics(root):

@@ -11,7 +11,7 @@ class ASTAnalyzer(object):
     """
     Takes the AST dumped and calculates metrics from it.
     """
-    def __init__(self, filename="../MemSan.dump", output_filename="test.dot"):
+    def __init__(self, filename="../MemSan.dump", output_filename="uml.dot"):
         self.filename = filename
         self.output_filename = output_filename
         self.AST = None

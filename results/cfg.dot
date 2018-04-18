@@ -1,0 +1,107 @@
+
+digraph G {
+        fontname = "Bitstream Vera Sans"
+        fontsize = 8
+
+        node [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+                shape = "record"
+        ]
+
+        edge [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+        ] 
+
+        
+end [label="end"]
+"main1" [label="main1"]
+"BinaryOperator2" [label="3:BinaryOperator2"]
+"BinaryOperator3" [label="4:BinaryOperator3"]
+"BinaryOperator4" [label="5:BinaryOperator4"]
+"BinaryOperator5" [label="6:BinaryOperator5"]
+"BinaryOperator6" [label="7:BinaryOperator6"]
+"callExpr7" [label="7:getchar"]
+"WhileBegin8" [label="WhileBegin8"]
+"Condition9" [label="Condition9"]
+"WhileEnd10" [label="WhileEnd10"]
+"callExpr38" [label="20:printf"]
+"callExpr39" [label="21:printf"]
+"callExpr40" [label="22:printf"]
+"return41" [label="return41"]
+"end" [label="end"]
+"BinaryOperator11" [label="8:BinaryOperator11"]
+"BinaryOperator12" [label="9:BinaryOperator12"]
+"BinaryOperator13" [label="9:BinaryOperator13"]
+"ifBegin14" [label="10:ifBegin"]
+"Condition15" [label="Condition15"]
+"ifEnd16" [label="10:ifEnd"]
+"ifBegin20" [label="12:ifBegin"]
+"Condition21" [label="Condition21"]
+"ifEnd22" [label="12:ifEnd"]
+"BinaryOperator36" [label="18:BinaryOperator36"]
+"callExpr37" [label="18:getchar"]
+"BinaryOperator23" [label="12:BinaryOperator23"]
+"BinaryOperator24" [label="12:BinaryOperator24"]
+"BinaryOperator25" [label="12:BinaryOperator25"]
+"BinaryOperator26" [label="12:BinaryOperator26"]
+"BinaryOperator27" [label="12:BinaryOperator27"]
+"BinaryOperator28" [label="13:BinaryOperator28"]
+"ifBegin29" [label="14:ifBegin"]
+"Condition30" [label="Condition30"]
+"ifEnd31" [label="14:ifEnd"]
+"BinaryOperator32" [label="14:BinaryOperator32"]
+"BinaryOperator33" [label="15:BinaryOperator33"]
+"BinaryOperator34" [label="16:BinaryOperator34"]
+"BinaryOperator35" [label="16:BinaryOperator35"]
+"BinaryOperator17" [label="10:BinaryOperator17"]
+"BinaryOperator18" [label="11:BinaryOperator18"]
+"BinaryOperator19" [label="11:BinaryOperator19"]
+main1 -> BinaryOperator2
+BinaryOperator2 -> BinaryOperator3
+BinaryOperator3 -> BinaryOperator4
+BinaryOperator4 -> BinaryOperator5
+BinaryOperator5 -> BinaryOperator6
+BinaryOperator6 -> callExpr7
+callExpr7 -> WhileBegin8
+WhileBegin8 -> Condition9
+Condition9 -> WhileEnd10
+Condition9 -> BinaryOperator11
+WhileEnd10 -> callExpr38
+BinaryOperator11 -> BinaryOperator12
+BinaryOperator12 -> BinaryOperator13
+BinaryOperator13 -> ifBegin14
+ifBegin14 -> Condition15
+Condition15 -> ifEnd16
+Condition15 -> BinaryOperator17
+ifEnd16 -> ifBegin20
+BinaryOperator17 -> BinaryOperator18
+BinaryOperator18 -> BinaryOperator19
+BinaryOperator19 -> ifEnd16
+ifBegin20 -> Condition21
+Condition21 -> ifEnd22
+Condition21 -> BinaryOperator23
+ifEnd22 -> BinaryOperator36
+BinaryOperator23 -> BinaryOperator24
+BinaryOperator24 -> BinaryOperator25
+BinaryOperator25 -> BinaryOperator26
+BinaryOperator26 -> BinaryOperator27
+BinaryOperator27 -> BinaryOperator28
+BinaryOperator28 -> ifBegin29
+ifBegin29 -> Condition30
+Condition30 -> ifEnd31
+Condition30 -> BinaryOperator32
+ifEnd31 -> ifEnd22
+BinaryOperator32 -> BinaryOperator33
+BinaryOperator33 -> BinaryOperator34
+BinaryOperator34 -> BinaryOperator35
+BinaryOperator35 -> ifEnd31
+BinaryOperator36 -> callExpr37
+callExpr37 -> Condition9
+callExpr38 -> callExpr39
+callExpr39 -> callExpr40
+callExpr40 -> return41
+return41 -> end
+
+}

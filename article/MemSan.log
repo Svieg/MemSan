@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.80.0 (TeX Live 2015/Debian) (rev 5238)  (format=lualatex 2017.9.21)  23 FEB 2018 08:33
+This is LuaTeX, Version beta-0.80.0 (TeX Live 2015/Debian) (rev 5238)  (format=lualatex 2017.9.21)  17 APR 2018 23:32
  restricted \write18 enabled.
 **MemSan.tex
 (./MemSan.tex
@@ -250,13 +250,39 @@ File: ot1phv.fd 2001/06/04 scalable font definitions for OT1/phv.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.05249> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 25.
 
-<images/cfg.png, id=1, 282.05376pt x 646.415pt>
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+
+
+] [2] [3]
+Underfull \hbox (badness 2088) in paragraph at lines 272--275
+[] \OT1/ptm/bx/n/10.03749 6.2.1. Dom-i-na-tors. [][] \OT1/ptm/m/n/10.03749 The 
+ref-er-ence im-ple-men-ta-tion was
+ []
+
+
+Underfull \hbox (badness 3780) in paragraph at lines 299--305
+[] \OT1/ptm/bx/n/10.03749 7.2.1. Con-trol De-pen-dency Graph. [][] \OT1/ptm/m/n
+/10.03749 Af-ter the post-
+ []
+
+[4] <images/uml.png, id=19, 216.81pt x 328.22626pt>
+File: images/uml.png Graphic file (type png)
+ <use images/uml.png>
+Package pdftex.def Info: images/uml.png used on input line 378.
+(pdftex.def)             Requested size: 216.80946pt x 328.22545pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [5]
+<images/cfg.png, id=23, 282.05376pt x 646.415pt>
 File: images/cfg.png Graphic file (type png)
  <use images/cfg.png>
-Package pdftex.def Info: images/cfg.png used on input line 113.
+Package pdftex.def Info: images/cfg.png used on input line 380.
 (pdftex.def)             Requested size: 282.05305pt x 646.41342pt.
 
-Overfull \hbox (53.19803pt too wide) in paragraph at lines 113--114
+Overfull \hbox (53.19803pt too wide) in paragraph at lines 380--381
 [][][] 
  []
 
@@ -271,35 +297,33 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-]
-Overfull \vbox (16.05089pt too high) has occurred while \output is active []
+Overfull \vbox (13.80402pt too high) has occurred while \output is active []
 
 
-[2
-
-<./images/cfg.png>] (./MemSan.aux))
+[6<./images/uml.png><./images/cfg.png>] (./MemSan.aux))
 
 Here is how much of LuaTeX's memory you used:
- 4002 strings out of 495004
+ 4015 strings out of 495004
  100000,128383 words of node,token memory allocated
- 258 words of node memory still in use:
+ 290 words of node memory still in use:
    2 hlist, 1 vlist, 1 rule, 2 glue, 36 glue_spec, 1 write nodes
-   avail lists: 2:18,3:71,4:1056,5:186,6:4139,7:401,9:127,10:294
- 7339 multiletter control sequences out of 65536+600000
+   avail lists: 1:1,2:18,3:121,4:1482,5:236,6:5635,7:399,9:142,10:469
+ 7344 multiletter control sequences out of 65536+600000
  121 fonts using 4759775 bytes
- 37i,7n,32p,240b,239s stack positions out of 5000i,500n,10000p,200000b,100000s
+ 37i,7n,32p,615b,239s stack positions out of 5000i,500n,10000p,200000b,100000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}<</usr/share/texlive/
 texmf-dist/fonts/type1/urw/times/utmb8a.pfb><</usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmbi8a.pfb><</usr/share/texlive/texmf-dist/fonts/type1/urw/ti
 mes/utmr8a.pfb><</usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb
 >
-Output written on MemSan.pdf (2 pages, 69250 bytes).
+Output written on MemSan.pdf (6 pages, 100581 bytes).
 
-PDF statistics: 30 PDF objects out of 1000 (max. 8388607)
- 19 compressed objects within 1 object stream
+PDF statistics: 44 PDF objects out of 1000 (max. 8388607)
+ 27 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

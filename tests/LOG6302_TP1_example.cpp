@@ -1,30 +1,28 @@
-class BaseClass {
-
-public:
-
-    int count;
-
-    void* returns_void_pointer() {return 0;}
-
-private:
-
-    long privateAttribute;
-
-};
-
-class ChildClass : public BaseClass {
+class Foo {
 
 public:
     int x;
 
-    int bar() {return 0;}
+    int bar() {
+        if (false)
+            return 42;
+        for (int i = 0; i < -1; i++);
+        return -1;
+    }
 
 };
 
-class NoMethods_UsesChildClass{
+int main(void) {
+    Foo foo;
 
-private:
+    if (foo.bar() == 17) {
+        while (true) {
+            if (foo.x == 42) {
+                break;
+            }
+            continue;
+        }
+    }
 
-    ChildClass childClassAttribute;
-
-};
+    return 0;
+}

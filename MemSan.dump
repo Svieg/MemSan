@@ -1,13 +1,42 @@
 <dump>
+<filename> LOG6302_TP1_example.cpp </filename>
+<class><className>Foo</className>
+<attribute>
+<attributeName>x</attributeName>
+<attributeType>int</attributeType>
+</attribute>
+<method>
+<methodName>bar</methodName>
+<methodReturnType>int</methodReturnType>
+<if>7
+<return>
+</return>
+</if>
+<for>
+<var> i </var>
+<binaryOperator>9</binaryOperator>
+<unaryOperator></unaryOperator>
+<unaryOperator></unaryOperator>
+</for>
+<return>
+<unaryOperator></unaryOperator>
+</return>
+</method>
+</class>
 <function> <functionName> main</functionName>
-    <while>
-        <if>
-            <return>
-                <unaryOperator></unaryOperator>
-            </return>
-        </if>
-    </while>
-    <return>
-    </return>
+<var> foo </var>
+<if>18
+<binaryOperator>18</binaryOperator>
+<callExpr>18:bar</callExpr>
+<while>
+<if>20
+<binaryOperator>20</binaryOperator>
+<break></break>
+</if>
+<continue></continue>
+</while>
+</if>
+<return>
+</return>
 </function>
 </dump>

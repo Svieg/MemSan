@@ -1,0 +1,33 @@
+<dump>
+<class><className>BaseClass</className>
+<attribute>
+<attributeName>count</attributeName>
+<attributeType>int</attributeType>
+</attribute>
+<method>
+<methodName>returns_void_pointer</methodName>
+<methodReturnType>void *</methodReturnType>
+</method>
+<attribute>
+<attributeName>privateAttribute</attributeName>
+<attributeType>long</attributeType>
+</attribute>
+</class>
+<class><className>ChildClass</className>
+<parentClass>class BaseClass</parentClass>
+<attribute>
+<attributeName>x</attributeName>
+<attributeType>int</attributeType>
+</attribute>
+<method>
+<methodName>bar</methodName>
+<methodReturnType>int</methodReturnType>
+</method>
+</class>
+<class><className>NoMethods_UsesChildClass</className>
+<attribute>
+<attributeName>childClassAttribute</attributeName>
+<attributeType>class ChildClass</attributeType>
+</attribute>
+</class>
+</dump>

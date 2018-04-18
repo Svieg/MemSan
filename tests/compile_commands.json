@@ -1,7 +1,7 @@
 [
 {
   "directory":"/home/svieg/school/fourth/6302/MemSan",
-  "command":"/home/svieg/tools/llvm+clang/bin/clang /home/svieg/school/fourth/6302/MemSan/sqlite3.c -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include/",
-  "file":"/home/svieg/school/fourth/6302/MemSan/sqlite3.c"
+  "command":"/home/svieg/tools/llvm+clang/bin/clang bitcoind.cpp -I/home/svieg/libcxx-3.3.src/include -I/home/svieg/tools/llvm+clang/lib/clang/3.3/include",
+  "file":"bitcoin.cpp"
 }
 ]
