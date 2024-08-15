@@ -41,8 +41,6 @@ class MyFrontendAction : public clang::ASTFrontendAction {
   CreateASTConsumer(clang::CompilerInstance &CI,
                                                         llvm::StringRef file) override {
     current_file++;
-    double pourc = current_file * 100.0 / nb_files;
-    std::cout << "[" << std::to_string((int) std::round(pourc)) << "%] " << file.str() << std::endl;
 
     return // Takes ownership of the pointer
 #if CLANG_VERSION_MAJOR<=3 && CLANG_VERSION_MINOR<6
@@ -106,21 +104,7 @@ int main(int argc, const char **argv) {
   } else {
     // Single file compilation
 
-    nb_files = 1;
-    std::vector<std::string> CommandLine;
-    CommandLine.push_back("clang-tool");
-    CommandLine.push_back("-c");
-    for (unsigned int i = 1; i < argc; ++i) {
-      CommandLine.push_back(std::string(argv[i]));
-    }
-
-    clang::tooling::ToolInvocation invocation(
-      std::move(CommandLine),
-      new MyFrontendAction, // Takes ownership of the pointer
-      new clang::FileManager(clang::FileSystemOptions()) // Takes ownership of the pointer
-    );
-    ret = invocation.run();
+  clang::tooling::runToolOnCode(std::make_unique<MyFrontendAction>(), argv[1]);
   }
-
   return ret;
 }
