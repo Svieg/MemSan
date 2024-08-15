@@ -5,8 +5,8 @@ std::string Visitor::convertExpressionToString(clang::Expr *E) {
   clang::SourceManager &SM = context_.getSourceManager();
   clang::LangOptions lopt;
 
-  clang::SourceLocation startLoc = E->getLocStart();
-  clang::SourceLocation _endLoc = E->getLocEnd();
+  clang::SourceLocation startLoc = E->getBeginLoc();
+  clang::SourceLocation _endLoc = E->getEndLoc();
   clang::SourceLocation endLoc = clang::Lexer::getLocForEndOfToken(_endLoc, 0, SM, lopt);
 
   return std::string(SM.getCharacterData(startLoc), SM.getCharacterData(endLoc) - SM.getCharacterData(startLoc));
@@ -48,7 +48,7 @@ bool Visitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *D) {
 /**********************/
 
 bool Visitor::TraverseIfStmt(clang::IfStmt *S) {
-  unsigned int line = context_.getSourceManager().getPresumedLoc(S->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(S->getBeginLoc(), 1).getLine();
   *getDumpFile()<<"<if>" << line << std::endl;
   clang::RecursiveASTVisitor<Visitor>::TraverseIfStmt(S);
   *getDumpFile()<<"</if>" << std::endl;
@@ -62,7 +62,7 @@ bool Visitor::TraverseIfStmt(clang::IfStmt *S) {
 
 bool Visitor::TraverseWhileStmt(clang::WhileStmt *S) {
 
-  unsigned int line = context_.getSourceManager().getPresumedLoc(S->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(S->getBeginLoc(), 1).getLine();
   *getDumpFile() << "<while>" << std::endl;
   clang::RecursiveASTVisitor<Visitor>::TraverseWhileStmt(S);
   *getDumpFile() << "</while>" << std::endl;
@@ -87,7 +87,7 @@ bool Visitor::TraverseCXXMethodDecl(clang::CXXMethodDecl *D) {
     else {
         *getDumpFile() << "<methodScope>private</methodScope>" << std::endl;
     }*/
-    *getDumpFile() << "<methodReturnType>" << D->getResultType().getAsString() << "</methodReturnType>" << std::endl;
+    *getDumpFile() << "<methodReturnType>" << D->getReturnType().getAsString() << "</methodReturnType>" << std::endl;
 
     clang::RecursiveASTVisitor<Visitor>::TraverseCXXMethodDecl(D);
 
@@ -123,7 +123,7 @@ bool Visitor::TraverseConditionalOperator(clang::ConditionalOperator *D) {
  * */
 
 bool Visitor::VisitVarDecl(clang::VarDecl *D) {
-  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
 
   *getDumpFile() << "<var> " << D->getName().str() << " </var>" << std::endl;
 
@@ -135,7 +135,7 @@ bool Visitor::VisitVarDecl(clang::VarDecl *D) {
  * */
 
 bool Visitor::VisitBreakStmt(clang::BreakStmt *D) {
-  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
 
   *getDumpFile() << "<break></break>" << std::endl;
   return true;
@@ -168,7 +168,7 @@ bool Visitor::VisitFieldDecl(clang::FieldDecl *D) {
  * */
 
 bool Visitor::TraverseReturnStmt(clang::ReturnStmt *D) {
-  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
 
     *getDumpFile() << "<return>" << std::endl;
     clang::RecursiveASTVisitor<Visitor>::TraverseReturnStmt(D);
@@ -177,7 +177,7 @@ bool Visitor::TraverseReturnStmt(clang::ReturnStmt *D) {
 }
 
 bool Visitor::VisitContinueStmt(clang::ContinueStmt *D) {
-  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
 
     *getDumpFile() << "<continue></continue>" << std::endl;
   return true;
@@ -186,7 +186,7 @@ bool Visitor::VisitContinueStmt(clang::ContinueStmt *D) {
 
 
 bool Visitor::TraverseForStmt(clang::ForStmt *D) {
-  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
 
     *getDumpFile() << "<for>" << std::endl;
     clang::RecursiveASTVisitor<Visitor>::TraverseForStmt(D);
@@ -196,7 +196,7 @@ bool Visitor::TraverseForStmt(clang::ForStmt *D) {
 }
 
 bool Visitor::VisitUnaryOperator(clang::UnaryOperator *D) {
-  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+  unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
 
     *getDumpFile() << "<unaryOperator></unaryOperator>" << std::endl;
   return true;
@@ -205,7 +205,7 @@ bool Visitor::VisitUnaryOperator(clang::UnaryOperator *D) {
 
 bool Visitor::VisitBinaryOperator(clang::BinaryOperator *D) {
 
-    unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+    unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
     *getDumpFile() << "<binaryOperator>" << line;
 
     std::string op = D->getOpcodeStr().data();
@@ -232,7 +232,7 @@ bool Visitor::VisitBinaryOperator(clang::BinaryOperator *D) {
 
 bool Visitor::VisitCallExpr(clang::CallExpr *D) {
     clang::FunctionDecl* f = D->getDirectCallee();
-    unsigned int line = context_.getSourceManager().getPresumedLoc(D->getLocStart(), 1).getLine();
+    unsigned int line = context_.getSourceManager().getPresumedLoc(D->getBeginLoc(), 1).getLine();
 
     *getDumpFile() << "<callExpr>" << line << ":" << f->getNameInfo().getName().getAsString() << "</callExpr>" << std::endl;
     return true;

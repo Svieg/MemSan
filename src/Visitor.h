@@ -62,8 +62,8 @@ private:
     bool invalid;
     if (!S) return "Something";
 
-    clang::CharSourceRange conditionRange = clang::CharSourceRange::getTokenRange(S->getLocStart(), S->getLocEnd());
-    std::string str = clang::Lexer::getSourceText(conditionRange, context_.getSourceManager(), context_.getLangOpts(), &invalid);
+    clang::CharSourceRange conditionRange = clang::CharSourceRange::getTokenRange(S->getBeginLoc(), S->getEndLoc());
+    std::string str = clang::Lexer::getSourceText(conditionRange, context_.getSourceManager(), context_.getLangOpts(), &invalid).str();
     if (invalid)
       return "Something";
     encode(str);
