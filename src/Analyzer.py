@@ -4,8 +4,8 @@ import sys
 import xml.etree.ElementTree as ET
 from FileNode import FileNode
 from ClassNode import ClassNode
-from MethodNode import MethodNode
-from AttributeNode import AttributeNode
+#from MethodNode import MethodNode
+#from AttributeNode import AttributeNode
 from BaseNode import BaseNode
 from Edge import Edge
 from metrics import get_metrics
