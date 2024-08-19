@@ -11,15 +11,15 @@ set(SOURCE_FILES src/main.cpp src/Visitor.cpp src/Visitor.h)
 # LOG6302
 # CHANGER LA VALEUR DE "LLVM_PATH" EN DESSOUS POUR UTILISER UNE AUTRE VERSION DE CLANG
 # NORMALEMENT, LLVM_PATH DOIT CONTENIR LES DOSSIERS "lib" ET "include".
-set(LLVM_PATH /home/svieg/projects/maitrise/clang+llvm)
+set(LLVM_PATH /usr/lib/llvm-16)
 
 set(USE_OLD_CLANG true)
-if (EXISTS "${LLVM_PATH}/lib/libLLVMProfileData.so")
-    set(USE_OLD_CLANG false)
-    MESSAGE(STATUS "Using recent version of LLVM/Clang")
-else()
-    MESSAGE(STATUS "Using old version of LLVM/Clang")
-endif()
+# if (EXISTS "${LLVM_PATH}/lib/libLLVMProfileData.so")
+#     set(USE_OLD_CLANG false)
+#     MESSAGE(STATUS "Using recent version of LLVM/Clang")
+# else()
+#     MESSAGE(STATUS "Using old version of LLVM/Clang")
+# endif()
 
 include_directories(
         ${LLVM_PATH}/include
