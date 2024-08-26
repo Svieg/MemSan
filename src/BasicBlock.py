@@ -23,3 +23,6 @@ class BasicBlock():
 
     def __str__(self):
         return self.name
+    
+    def __hash__(self) -> int:
+        return int(self.name[3:], 16)
