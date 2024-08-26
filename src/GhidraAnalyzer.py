@@ -6,7 +6,7 @@ class GhidraAnalyzer():
     def __init__(self):
         self.name = "GhidraAnalyzer"
         self.filename = "cfg/entry.dot"
-        self.basic_blocks = {}
+        self.basic_blocks = set()
         self.edges = []
 
     def load_cfg(self):
@@ -18,7 +18,7 @@ class GhidraAnalyzer():
         matches = regex.findall(dot)
 
         for match in matches:
-            self.basic_blocks[match] = BasicBlock(match)
+            self.basic_blocks.add(BasicBlock(match))
 
         print(self.basic_blocks)
         # load edges
@@ -36,20 +36,26 @@ class GhidraAnalyzer():
 
     def build_dom_tree(self):
         changed = False
+        # Initialize every basic block with all the nodes as dominators, except the entry node
+        for basic_block_name in self.basic_blocks:
+            basic_block = self.basic_blocks[basic_block_name]
+            if basic_block.entry_node:
+                basic_block.dominators.append(basic_block)
+            else:
+                basic_block.dominators = self.basic_blocks
+        
+        # Iterate through all basic blocks and intersect with its predecessors' dominators
         for basic_block_name in self.basic_blocks:
             new_doms = []
-            predecessors = self.basic_blocks[basic_block_name].predecessors
+            basic_block = self.basic_blocks[basic_block_name]
+            predecessors = basic_block.predecessors
             for predecessor in predecessors:
-                for second_order_predecessor in predecessors.predecessors:
-                    
-            
+                new_doms = basic_block.dom
 
-
-        
 
 if __name__ == "__main__":
     ghidra_analyzer = GhidraAnalyzer()
     ghidra_analyzer.load_cfg()
     ghidra_analyzer.build_dom_tree()
     #ghidra_analyzer.build_pdom_tree()
-    #ghidra_analyzer.build_cd # WTF is CD?
+    #ghidra_analyzer.build_cd # Code Dependence Graph
