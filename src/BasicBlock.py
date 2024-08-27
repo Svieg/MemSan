@@ -3,11 +3,11 @@ class BasicBlock():
         self.name = name
         self.entry_node = entry_node
         self.edges = []
-        self.predecessors = []
+        self.predecessors = set()
         self.successors = []
         self.parents = []
         self.children = []
-        self.dominators = []
+        self.dominators = set()
         self.postdominators = []
 
     def __eq__(self, other):
@@ -22,7 +22,7 @@ class BasicBlock():
         return None
 
     def __str__(self):
-        return self.name
+        return self.name.decode()
     
     def __hash__(self) -> int:
         return int(self.name[3:], 16)
