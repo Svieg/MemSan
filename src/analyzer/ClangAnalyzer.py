@@ -495,14 +495,10 @@ def dump_dot(filename, content):
 
 if __name__ == "__main__":
     analyzer = ASTAnalyzer()
-    analyzer.load_AST()
-    analyzer.get_root_node()
+    #analyzer.load_AST()
+    #analyzer.get_root_node()
 
-    #tp1
-    if len(sys.argv) == 2 and sys.argv[1] == "-tp1":
-        get_metrics(analyzer.get_root())
-
-    analyzer.buildCFG()
+    analyzer.loadCFG()
     analyzer.java_dom_tree()
     analyzer.java_dump_dom()
     analyzer.java_pdom_tree()

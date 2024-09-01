@@ -46,7 +46,7 @@ def addBB(bb, G, bb_func_map):
         lastInstStart = codeUnit.getAddress().getOffset()
         lastInstEnd = lastInstStart + codeUnit.getLength()
 
-        bb_tbl_rows += ('''\t<TR><TD>%s:%s</TD></TR>\n''' % (lastInstStart, str(codeUnit)))
+        bb_tbl_rows += ('''\t<TR><TD>%x:%s</TD></TR>\n''' % (lastInstStart, str(codeUnit)))
         i += 1 # Bump Counter
 
     bb_tbl_node = ('''  bb_%x [shape=plaintext label=<

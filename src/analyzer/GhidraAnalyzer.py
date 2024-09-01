@@ -7,6 +7,8 @@ class GhidraAnalyzer():
         self.name = "GhidraAnalyzer"
         self.filename = "cfg/entry.dot"
         self.basic_blocks = {}
+        self.reversed_cfg = []
+        self.dominator_tree = []
         self.edges = []
 
     def load_cfg(self):
@@ -28,13 +30,20 @@ class GhidraAnalyzer():
 
         for match in matches:
             #print(f"Edge: {match}")
-            self.edges.append(Edge(match[0], match[1]))
-            self.basic_blocks[match[0]].children.append(match[1])
-            self.basic_blocks[match[0]].successors.append(match[1])
-            self.basic_blocks[match[1]].parents.append(match[0])
-            self.basic_blocks[match[1]].predecessors.add(self.basic_blocks[match[0]])
+            parent = match[0]
+            child = match[1]
+            self.edges.append(Edge(parent, child))
+            self.basic_blocks[parent].children.append(child)
+            self.basic_blocks[parent].successors.append(child)
+            self.basic_blocks[child].parents.append(self.basic_blocks[parent])
+            self.basic_blocks[child].predecessors.add(self.basic_blocks[parent])
 
-    def build_dom_tree(self):
+    def reverse_cfg(self):
+        for i in range(len(self.basic_blocks), 1, -1):
+            cfg = list(self.basic_blocks.values())
+            self.reversed_cfg.append(cfg[i-1])
+    
+    def calculate_dominators(self):
         changed = True
         # Initialize every basic block with all the nodes as dominators, except the entry node
         for basic_block_name in self.basic_blocks:
@@ -68,9 +77,21 @@ class GhidraAnalyzer():
             print(basic_block)
             print(basic_block.dominators)
 
+
+    def build_dom_tree(self):
+        self.reverse_cfg()
+        for basic_block in self.reversed_cfg:
+            dominators = basic_block.dominators
+            for dominator in dominators:
+                if dominator in basic_block.parents:
+                    print(f"idom: {dominator}")
+
+
+
 if __name__ == "__main__":
     ghidra_analyzer = GhidraAnalyzer()
     ghidra_analyzer.load_cfg()
+    ghidra_analyzer.calculate_dominators()
     ghidra_analyzer.build_dom_tree()
     #ghidra_analyzer.build_pdom_tree()
     #ghidra_analyzer.build_cd # Code Dependence Graph
